@@ -2,13 +2,13 @@
 #include "utils.h"
 
 int main() {
-	Clause *c;
 	Model *M = new Model();
 	M->add_variable("x");
 	M->add_variable("y");
 	M->add_variable("z");
-	M->add_clause("!x&z");
-	c = M->get_clause();
-	std::cout << int(c->get_literal()) << std::endl;
+	M->add_clause("trans", "!x|z");
+	M->add_clause("trans", "!y|!z");
+	M->add_clause("trans", "x|!y");
+	M->show_trans();
 	delete M;
 }
