@@ -57,7 +57,8 @@ void Model::show_trans() {
 	for (uint8_t i = 0 ; i < trans.size() ; ++i) {
 			c = trans[i]->get_literals();
 			for (uint8_t j = 0 ; j < c->size() ; ++j)
-				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) << std::endl;
+				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
+			std::cout << std::endl;
 		}
 }
 
@@ -66,6 +67,7 @@ void Model::show_init() {
 	for (uint8_t i = 0 ; i < init.size() ; ++i) {
 			c = init[i]->get_literals();
 			for (uint8_t j = 0 ; j < c->size() ; ++j)
-				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) << std::endl;
+				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
+			std::cout << std::endl;
 		}
 }
