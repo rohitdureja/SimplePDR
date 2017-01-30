@@ -14,32 +14,10 @@
 #include <cstdint>
 #include <cstdlib>
 #include <map>
+#include "utils.h"
 
 /*
- * Clause class to maintain a vector of encoded literals.
- * Note: Negative values in the vector denote a negated literal.
- */
-class Clause {
-	/*
-	 * Vector containing signed values for literals
-	 */
-	std::vector<int8_t> literals;
-public:
-	/*
-	 * Member function to add a literal to a clause
-	 * \param t The value to write
-	 */
-	void add_literal(int8_t);
-	/*
-	 * Member function to return a pointer to the vector containing
-	 * literals in the clause.
-	 * \return a pointer to the literals vectors
-	 */
-	std::vector<int8_t> * get_literals();
-};
-
-/*
- * Model class to maintain attributes of the transition system
+ * ``Model'' class to maintain attributes of the transition system
  * Maintains the set of variables, the transition system (in CNF),
  * initial state (in CNF).
  */

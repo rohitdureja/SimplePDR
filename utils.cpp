@@ -16,3 +16,14 @@ void split(const std::string &s, const char* delim, std::vector<std::string> & v
     }
     free(dup);
 }
+
+/**
+ *
+ */
+void Clause::add_literal(int8_t literal) {
+	literals.push_back(literal);
+}
+
+std::vector<int8_t> * Clause::get_literals() {
+	return &literals;
+}

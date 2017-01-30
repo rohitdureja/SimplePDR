@@ -8,17 +8,6 @@
 #include "model.h"
 #include "utils.h"
 
-/**
- *
- */
-void Clause::add_literal(int8_t literal) {
-	literals.push_back(literal);
-}
-
-std::vector<int8_t> * Clause::get_literals() {
-	return &literals;
-}
-
 void Model::add_variable(const std::string var_name) {
 	var_map1[var_name] = vcount;
 	var_map2[vcount] = var_name;
