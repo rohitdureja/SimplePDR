@@ -15,8 +15,8 @@ int main() {
 	M->show_trans();
 	M->show_init();
 	delete M;
-	std::cout << "de-Morgan example\n";
 
+	std::cout << "de-Morgan example\n";
 	z3::context c;
 
 	z3::expr x = c.bool_const("x");
