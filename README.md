@@ -1,4 +1,4 @@
-# SimpleIC3
-A reference implementation of IC3 for boolean transition systems
+# SimplePDR
+A reference implementation of property directed reachability for boolean transition systems.
 
 [![Build Status](https://travis-ci.org/rohitdureja/SimpleIC3.svg?branch=master)](https://travis-ci.org/rohitdureja/SimpleIC3)

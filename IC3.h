@@ -10,6 +10,7 @@
 
 #include "z3++.h"
 #include "model.h"
+#include "solver.h"
 
 namespace IC3 {
 
