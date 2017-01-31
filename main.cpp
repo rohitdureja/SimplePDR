@@ -22,4 +22,6 @@ int main() {
 	// Clean up
 	delete M;
 	delete ic3_instance;
+
+	return 0;
 }
