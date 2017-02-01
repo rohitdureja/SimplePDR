@@ -8,13 +8,14 @@
 #ifndef IC3_H_
 #define IC3_H_
 
-#include "z3++.h"
 #include "model.h"
 #include "solver.h"
 
 namespace IC3 {
 
 class IC3 {
+private:
+	Solver::Solver * s;
 public:
 	IC3(Model *);
 	bool prove();
