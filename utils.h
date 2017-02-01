@@ -21,19 +21,19 @@ class Clause {
 	/*
 	 * Vector containing signed values for literals
 	 */
-	std::vector<int8_t> literals;
+	std::vector<signed char> literals;
 public:
 	/*
 	 * Member function to add a literal to a clause
 	 * \param t The value to write
 	 */
-	void add_literal(int8_t);
+	void add_literal(signed char);
 	/*
 	 * Member function to return a pointer to the vector containing
 	 * literals in the clause.
 	 * \return a pointer to the literals vectors
 	 */
-	std::vector<int8_t> * get_literals();
+	std::vector<signed char> * get_literals();
 };
 
 #endif /* UTILS_H_ */

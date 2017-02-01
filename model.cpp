@@ -18,7 +18,7 @@ void Model::add_clause(const std::string type, const std::string clause) {
 	Clause *c = new Clause();
 	std::vector<std::string> parse;
 	split(clause, "|", parse);
-	for (uint8_t i = 0 ; i < parse.size(); ++i) {
+	for (unsigned char i = 0 ; i < parse.size(); ++i) {
 		if (parse[i][0] == '!') {
 			parse[i].erase(parse[i].begin());
 			c->add_literal(-var_map1[parse[i]]);
@@ -43,19 +43,19 @@ std::vector<Clause*> * Model::get_init() {
 
 void Model::show_trans() {
 	std::vector<int8_t> * c;
-	for (uint8_t i = 0 ; i < trans.size() ; ++i) {
+	for (unsigned char i = 0 ; i < trans.size() ; ++i) {
 			c = trans[i]->get_literals();
-			for (uint8_t j = 0 ; j < c->size() ; ++j)
+			for (unsigned char j = 0 ; j < c->size() ; ++j)
 				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
 			std::cout << std::endl;
 		}
 }
 
 void Model::show_init() {
-	std::vector<int8_t> * c;
-	for (uint8_t i = 0 ; i < init.size() ; ++i) {
+	std::vector<signed char> * c;
+	for (unsigned char i = 0 ; i < init.size() ; ++i) {
 			c = init[i]->get_literals();
-			for (uint8_t j = 0 ; j < c->size() ; ++j)
+			for (unsigned char j = 0 ; j < c->size() ; ++j)
 				std::cout << ((*c)[j] > 0 ? var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
 			std::cout << std::endl;
 		}

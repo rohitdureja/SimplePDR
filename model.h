@@ -30,8 +30,8 @@ class Model {
 	std::vector<Clause*> init;
 
 	// Helpers objects
-	std::map<std::string, int8_t> var_map1; //	name -> int
-	std::map<int8_t, std::string> var_map2; //	int -> name
+	std::map<std::string, signed char> var_map1; //	name -> int
+	std::map<signed char, std::string> var_map2; //	int -> name
 	int8_t vcount;
 
 public:
@@ -40,9 +40,9 @@ public:
 		vcount = 101;
 	}
 	~Model() {
-		for(uint8_t i = 0 ; i < trans.size() ; ++i)
+		for(unsigned char i = 0 ; i < trans.size() ; ++i)
 			delete trans[i];
-		for(uint8_t i = 0 ; i < init.size() ; ++i)
+		for(unsigned char i = 0 ; i < init.size() ; ++i)
 			delete init[i];
 	}
 	void add_variable(const std::string);

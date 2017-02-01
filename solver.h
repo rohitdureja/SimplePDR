@@ -14,6 +14,11 @@ class Solver {
 public:
 	Solver();
 	virtual ~Solver();
+	void push();
+	void pop();
+	void add_var();
+	void add_constraints();
+	void check_sat();
 };
 
 } /* namespace Solver */

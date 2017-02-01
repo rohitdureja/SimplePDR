@@ -25,3 +25,7 @@ int main() {
 
 	return 0;
 }
+
+// 2017-01-31
+// TODO Generate SMT string from clauses
+// TODO Send queries to Z3

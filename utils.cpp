@@ -20,10 +20,10 @@ void split(const std::string &s, const char* delim, std::vector<std::string> & v
 /**
  *
  */
-void Clause::add_literal(int8_t literal) {
+void Clause::add_literal(signed char literal) {
 	literals.push_back(literal);
 }
 
-std::vector<int8_t> * Clause::get_literals() {
+std::vector<signed char> * Clause::get_literals() {
 	return &literals;
 }
