@@ -38,13 +38,15 @@ void Solver::add_symbol(type tsort) {
 
 		std::string conjectur = "(assert (= x y))";
 		Z3_ast parsed1 = Z3_parse_smtlib2_string(*c, (Z3_string) conjectur.c_str(), 0, 0, 0, names.size(), symbols, decls);
+		std::cout << Z3_ast_to_string(*c, parsed1);
 		z3::expr conjecture1(*c, parsed1);
 
 		// adding the negation of the conjecture as a constraint.
 		s->add(!conjecture1);
 //		s.push();
-//		std::string conjectur3 = "(assert (or x y))";
-//		Z3_ast parsed3 = Z3_parse_smtlib2_string(c, (Z3_string) conjectur3.c_str(), 0, 0, 0, names.size(), symbols, decls);
+		std::string conjectur3 = "(assert (or x y))";
+		Z3_ast parsed3 = Z3_parse_smtlib2_string(*c, (Z3_string) conjectur3.c_str(), 0, 0, 0, names.size(), symbols, decls);
+		std::cout << Z3_ast_to_string(*c, parsed3);
 //		z3::expr conjecture3(c, parsed3);
 //		s.add(!conjecture3);
 		std::cout << *s << "\n";
