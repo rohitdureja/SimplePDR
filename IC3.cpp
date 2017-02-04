@@ -22,14 +22,15 @@
 namespace IC3 {
 
 IC3::IC3(Model *M) {
-//	M->show_init();
-//	M->show_trans();
+	M->show_init();
+	M->show_trans();
 	solver = new Solver::Solver();
-	solver->add_symbol("x", Solver::Integer);
-	solver->add_symbol("y", Solver::Integer);
-	solver->add_symbol("z", Solver::Integer);
-	solver->add_assertion("(assert (> x y))");
-	solver->add_assertion("(assert (< x z))");
+	std::vector<std::string> * vars;
+	vars = M->get_variables();
+	for (unsigned int i = 0 ; i < vars->size() ; ++i)
+		solver->add_symbol((*vars)[i], Solver::Boolean);
+	solver->add_assertion("(assert (= x y))");
+	solver->add_assertion("(assert (= x z))");
 	solver->check_sat();
 	solver->get_model();
 //	solver->push(1);

@@ -48,7 +48,6 @@ public:
 	void add_assertion(const std::string);
 	result check_sat();
 	void get_model();
-
 };
 
 } /* namespace Solver */

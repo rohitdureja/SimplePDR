@@ -42,14 +42,16 @@ class Model {
 	std::vector<Clause*> init;
 
 	// Helpers objects
-	std::map<std::string, signed char> var_map1; //	name -> int
-	std::map<signed char, std::string> var_map2; //	int -> name
+	std::map<std::string, unsigned char> var_map1; //	name -> int
+	std::map<unsigned char, std::string> var_map2; //	int -> name
+	std::vector<std::string> str_vars;
+	std::vector<unsigned char> enc_vars;
 	int8_t vcount;
 
 public:
 
 	Model() {
-		vcount = 101;
+		vcount = 100;
 	}
 	~Model() {
 		for(unsigned char i = 0 ; i < trans.size() ; ++i)
@@ -57,6 +59,9 @@ public:
 		for(unsigned char i = 0 ; i < init.size() ; ++i)
 			delete init[i];
 	}
+
+	std::vector<std::string> * get_variables();
+	std::vector<unsigned char> * get_encoded_variables();
 	void add_variable(const std::string);
 	void add_clause(const std::string, const std::string);
 	std::vector<Clause *> * get_trans();

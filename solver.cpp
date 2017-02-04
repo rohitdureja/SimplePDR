@@ -77,10 +77,11 @@ void Solver::pop(const unsigned int step) {
 
 void Solver::get_model() {
 	z3::model m = s->get_model();
-	 for (unsigned i = 0; i < m.size(); i++) {
-	        z3::func_decl v = m[i];
-	        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-	    }
+	Cube *c = new Cube();
+	for (unsigned i = 0; i < m.size(); i++) {
+		z3::func_decl v = m[i];
+		std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+	}
 }
 
 Solver::~Solver() {
