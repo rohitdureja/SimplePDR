@@ -25,11 +25,11 @@ IC3::IC3(Model *M) {
 //	M->show_init();
 //	M->show_trans();
 	solver = new Solver::Solver();
-	solver->add_symbol("x", Solver::Boolean);
-	solver->add_symbol("y", Solver::Boolean);
-	solver->add_symbol("z", Solver::Boolean);
-	solver->add_assertion("(assert (= x y))");
-	solver->add_assertion("(assert (= x z))");
+	solver->add_symbol("x", Solver::Integer);
+	solver->add_symbol("y", Solver::Integer);
+	solver->add_symbol("z", Solver::Integer);
+	solver->add_assertion("(assert (> x y))");
+	solver->add_assertion("(assert (< x z))");
 	solver->check_sat();
 	solver->get_model();
 //	solver->push(1);

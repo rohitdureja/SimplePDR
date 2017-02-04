@@ -79,8 +79,6 @@ void Solver::get_model() {
 	z3::model m = s->get_model();
 	 for (unsigned i = 0; i < m.size(); i++) {
 	        z3::func_decl v = m[i];
-	        // this problem contains only constants
-	        assert(v.arity() == 0);
 	        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
 	    }
 }
