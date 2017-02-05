@@ -23,6 +23,10 @@
 #include <string>
 #include <vector>
 
+// utility to convert anthing to a string
+template<typename T>
+std::string tostring(const T& x);
+
 void split(const std::string &s, const char* delim, std::vector<std::string> & v);
 
 /*
@@ -47,7 +51,5 @@ public:
 	 */
 	std::vector<signed char> * get_literals();
 };
-
-typedef Clause Cube;
 
 #endif /* UTILS_H_ */

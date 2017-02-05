@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "utils.h"
+#include <sstream>
 
 void split(const std::string &s, const char* delim, std::vector<std::string> & v){
     char * dup = strdup(s.c_str());
@@ -38,4 +39,11 @@ void Clause::add_literal(signed char literal) {
 
 std::vector<signed char> * Clause::get_literals() {
 	return &literals;
+}
+
+// utility to convert anthing to a string
+template<typename T> std::string tostring(const T& x) {
+    std::ostringstream os;
+    os << x;
+    return os.str();
 }

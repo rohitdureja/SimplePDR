@@ -19,6 +19,7 @@
 
 #include "solver.h"
 #include <vector>
+#include <string>
 
 namespace Solver {
 
@@ -72,16 +73,12 @@ void Solver::push(const unsigned int step) {
 
 void Solver::pop(const unsigned int step) {
 	for (unsigned int i = 0 ; i < step ; ++i)
-			s->pop();
+		s->pop();
 }
 
-void Solver::get_model() {
+std::string Solver::get_model() {
 	z3::model m = s->get_model();
-	Cube *c = new Cube();
-	for (unsigned i = 0; i < m.size(); i++) {
-		z3::func_decl v = m[i];
-		std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-	}
+	return Z3_model_to_string(*c, m);
 }
 
 Solver::~Solver() {
