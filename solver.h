@@ -26,7 +26,6 @@
 
 namespace Solver {
 
-
 enum result {sat, unsat, unknown};
 enum type {Integer, Boolean};
 

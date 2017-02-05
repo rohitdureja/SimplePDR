@@ -47,4 +47,3 @@ int main() {
 
 // 2017-01-31
 // TODO Generate SMT string from clauses
-// TODO Send queries to Z3

@@ -45,7 +45,6 @@ class Model {
 	std::map<std::string, unsigned char> var_map1; //	name -> int
 	std::map<unsigned char, std::string> var_map2; //	int -> name
 	std::vector<std::string> str_vars;
-	std::vector<unsigned char> enc_vars;
 	int8_t vcount;
 
 public:
@@ -61,7 +60,6 @@ public:
 	}
 
 	std::vector<std::string> * get_variables();
-	std::vector<unsigned char> * get_encoded_variables();
 	void add_variable(const std::string);
 	void add_clause(const std::string, const std::string);
 	std::vector<Clause *> * get_trans();

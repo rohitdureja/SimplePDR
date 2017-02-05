@@ -78,6 +78,3 @@ std::vector<std::string> * Model::get_variables() {
 	return &str_vars;
 }
 
-std::vector<unsigned char> * Model::get_encoded_variables() {
-	return &enc_vars;
-}
