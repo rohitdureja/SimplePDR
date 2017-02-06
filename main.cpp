@@ -22,20 +22,28 @@
 
 int main() {
     // Specify transition system
-    Model *M = new Model();
-    M->add_variable("x");
-    M->add_variable("y");
-    M->add_variable("z");
-    M->add_variable("nx");
-    M->add_variable("ny");
-    M->add_variable("nz");
-    M->add_clause("trans", "!x|z");
-    M->add_clause("trans", "!y|!z");
-    M->add_clause("trans", "nx|!ny|z");
-    M->add_clause("trans", "!z");
+    Model::Model *M = new Model::Model();
 
-    M->add_clause("init", "!x|y");
-    M->add_clause("init", "!nz");
+    // state variables
+    M->add_variable("a");
+    M->add_variable("b");
+    M->add_variable("na");
+    M->add_variable("nb");
+
+    // initial states
+    M->add_clause(Model::I, "!a");
+    M->add_clause(Model::I, "!b");
+
+    // transition relations
+    M->add_clause(Model::T, "a||!b||nb");
+    M->add_clause(Model::T, "a||b||!na");
+    M->add_clause(Model::T, "!a||na");
+    M->add_clause(Model::T, "!a||!nb");
+    M->add_clause(Model::T, "b||!nb");
+
+    // safety property
+    M->add_clause(Model::P, "!a||b");
+
 
     // Create IC3 instance
     IC3::IC3 * ic3_instance = new IC3::IC3(M);
@@ -51,4 +59,3 @@ int main() {
 }
 
 // 2017-01-31
-// TODO Generate SMT string from clauses

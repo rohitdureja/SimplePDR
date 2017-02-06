@@ -28,6 +28,11 @@
 #include <map>
 #include "utils.h"
 
+namespace Model {
+
+enum type {
+    I, T, P
+};
 /*
  * ``Model'' class to maintain attributes of the transition system
  * Maintains the set of variables, the transition system (in CNF),
@@ -40,6 +45,7 @@ class Model {
      */
     std::vector<Clause*> trans;
     std::vector<Clause*> init;
+    std::vector<Clause*> prop;
 
     // Helpers objects
     std::map<std::string, unsigned char> var_map1; //	name -> int
@@ -61,12 +67,14 @@ public:
 
     std::vector<std::string> * get_variables();
     void add_variable(const std::string);
-    void add_clause(const std::string, const std::string);
+    void add_clause(const type, const std::string);
     std::vector<Clause *> * get_trans();
     std::vector<Clause *> * get_init();
     void show_trans();
     void show_init();
     std::map<unsigned char, std::string> * get_var_map();
 };
+
+}
 
 #endif /* MODEL_H_ */

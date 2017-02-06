@@ -65,7 +65,7 @@ private:
 
     bool rec_block(Cube *, unsigned int);
 public:
-    IC3(Model *);
+    IC3(Model::Model *);
     bool prove();
     virtual ~IC3();
 };

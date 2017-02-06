@@ -20,6 +20,8 @@
 #include "model.h"
 #include "utils.h"
 
+namespace Model {
+
 void Model::add_variable(const std::string var_name) {
     var_map1[var_name] = vcount;
     str_vars.push_back(var_name);
@@ -27,10 +29,11 @@ void Model::add_variable(const std::string var_name) {
     vcount = vcount + 1;
 }
 
-void Model::add_clause(const std::string type, const std::string clause) {
+void Model::add_clause(const type ctype,
+                       const std::string clause) {
     Clause *c = new Clause();
     std::vector<std::string> parse;
-    split(clause, "|", parse);
+    split(clause, "||", parse);
     for (unsigned char i = 0; i < parse.size(); ++i) {
         if (parse[i][0] == '!') {
             parse[i].erase(parse[i].begin());
@@ -38,10 +41,12 @@ void Model::add_clause(const std::string type, const std::string clause) {
         } else
             c->add_literal(var_map1[parse[i]]);
     }
-    if (type == "trans")
+    if (ctype == T)
         trans.push_back(c);
-    else if (type == "init")
+    else if (ctype == I)
         init.push_back(c);
+    else if (ctype == P)
+        prop.push_back(c);
     else
         std::cout << "Undefined type!" << std::endl;
 }
@@ -85,3 +90,4 @@ std::map<unsigned char, std::string> * Model::get_var_map() {
     return &var_map2;
 }
 
+} /* namespace Model */

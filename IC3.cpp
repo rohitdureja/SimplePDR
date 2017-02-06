@@ -21,7 +21,7 @@
 
 namespace IC3 {
 
-IC3::IC3(Model *M) {
+IC3::IC3(Model::Model *M) {
 //	M->show_init();
     M->show_trans();
     solver = new Solver::Solver();
