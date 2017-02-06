@@ -46,24 +46,24 @@ IC3::IC3(Model::Model *M) {
 
 //	solver->add_assertion("(assert (= x y))");
 //	solver->add_assertion("(assert (= (not x) z))");
-
-	Solver::result res;
-	res = solver->check_sat();
-	if (res == Solver::sat) {
-		std::cout << solver->get_model() << std::endl;
-	}
-
-	generate_smtlib2_string(init, smt2, map);
-    for (unsigned int i = 0; i < smt2.size(); ++i) {
-        solver->add_assertion(smt2[i]);
-    }
-
-//  solver->add_assertion("(assert (= x y))");
-//  solver->add_assertion("(assert (= (not x) z))");
-    res = solver->check_sat();
-    if (res == Solver::sat) {
-        std::cout << solver->get_model() << std::endl;
-    }
+//
+//	Solver::result res;
+//	res = solver->check_sat();
+//	if (res == Solver::sat) {
+//		std::cout << solver->get_model() << std::endl;
+//	}
+//
+//	generate_smtlib2_string(init, smt2, map);
+//    for (unsigned int i = 0; i < smt2.size(); ++i) {
+//        solver->add_assertion(smt2[i]);
+//    }
+//
+////  solver->add_assertion("(assert (= x y))");
+////  solver->add_assertion("(assert (= (not x) z))");
+//    res = solver->check_sat();
+//    if (res == Solver::sat) {
+//        std::cout << solver->get_model() << std::endl;
+//    }
 
 //	solver->push(1);
 //	solver->add_assertion("(assert (= x z))");

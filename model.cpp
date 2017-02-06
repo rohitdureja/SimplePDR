@@ -63,9 +63,9 @@ void Model::show_trans() {
     for (unsigned char i = 0; i < trans.size(); ++i) {
         c = trans[i]->get_literals();
         for (unsigned char j = 0; j < c->size(); ++j)
-            std::cout
-                    << ((*c)[j] > 0 ?
-                            var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
+            std::cout << ((*c)[j] > 0 ?
+                         var_map2[(*c)[j]] :
+                         "!" + var_map2[-(*c)[j]]) + " ";
         std::cout << std::endl;
     }
 }
@@ -75,9 +75,9 @@ void Model::show_init() {
     for (unsigned char i = 0; i < init.size(); ++i) {
         c = init[i]->get_literals();
         for (unsigned char j = 0; j < c->size(); ++j)
-            std::cout
-                    << ((*c)[j] > 0 ?
-                            var_map2[(*c)[j]] : "!" + var_map2[-(*c)[j]]) + " ";
+            std::cout << ((*c)[j] > 0 ?
+                         var_map2[(*c)[j]] :
+                         "!" + var_map2[-(*c)[j]]) + " ";
         std::cout << std::endl;
     }
 }

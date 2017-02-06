@@ -37,22 +37,22 @@ private:
      * to clauses.
      *
      * Reference use:
-     * frames.push_back(M->get_init()); 		// push init to frame[0]
+     * frames.push_back(M->get_init());         // push init to frame[0]
      *
-     * std::vector<Clause *> * c = frames[0]; 	// get vector containing
+     * std::vector<Clause *> * c = frames[0];   // get vector containing
      * 									   	    // pointers to clauses of
      * 									   	    // frame[0]
      *
      * std::cout << c->size() << std::endl;
      * for (unsigned int j = 0 ; j <c->size() ; ++j) {
-     * 	Clause * f = (*c)[j]; 				    // get j-th of clause of
-     * 										    // frame[0]
+     * 	Clause * f = (*c)[j];                   // get j-th of clause of
+     * 	                                        // frame[0]
      *
-     * 	std::vector<signed char> * lit; 	    // pointer to a vector of
-     * 										    // literals.
+     * 	std::vector<signed char> * lit;         // pointer to a vector of
+     * 	                                        // literals.
      *
-     * 	lit = f->get_literals();  			    // make lit point to literals in
-     * 							  			    // j-th clause of frame[0]
+     * 	lit = f->get_literals();                // make lit point to literals in
+     * 	                                        // j-th clause of frame[0]
      *
      * 	for (unsigned int i = 0 ; i < lit->size() ; ++i)
      * 	std::cout << (*lit)[i] << std::endl;

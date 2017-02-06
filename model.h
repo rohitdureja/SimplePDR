@@ -63,6 +63,8 @@ public:
             delete trans[i];
         for (unsigned char i = 0; i < init.size(); ++i)
             delete init[i];
+        for (unsigned char i = 0; i < prop.size(); ++i)
+            delete prop[i];
     }
 
     std::vector<std::string> * get_variables();
