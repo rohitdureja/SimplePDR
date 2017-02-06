@@ -31,7 +31,7 @@ enum type {Integer, Boolean};
 
 class Solver {
 private:
-	z3::context * c;
+	z3::context c;
 	z3::solver * s;
 	unsigned int nsymbols;
 	std::vector<z3::symbol> names;

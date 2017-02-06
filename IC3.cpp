@@ -30,6 +30,12 @@ IC3::IC3(Model *M) {
 		solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
 	}
 
+	// get pointer to initial states
+	init = M->get_init();
+
+	// get pointer to transition relation
+	trans = M->get_trans();
+
 	solver->add_assertion("(assert (= x y))");
 	solver->add_assertion("(assert (= (not x) z))");
 
@@ -81,9 +87,48 @@ IC3::IC3(Model *M) {
  *
  */
 
-// TODO: Implement data structure to maintain frames
 bool IC3::prove() {
-		return true;
+	// find 0-step counterexample
+	solver->push(1);
+	solver->add_assertion("(assert (and init (not prop)))");
+	if (solver->check_sat() == Solver::sat)
+		return false;
+	solver->pop(1);
+
+	// first element of frame is init formula
+	frames.push_back(init);
+
+	unsigned int k = 1; // active frame number
+	frames.push_back(NULL); // add a new frame to the trace
+
+	while (false) {
+		// blocking phase
+		solver->push(1);
+		solver->add_assertion("(assert (and frame[k] (not prop)))");
+		while (solver->check_sat() == Solver::sat) {
+			std::string model = solver->get_model();
+			solver->pop(1);
+			if (!rec_block(NULL, k))
+				return false;
+		}
+
+		// propagation phase
+		k = k + 1; // move to next frame
+		frames.push_back(NULL); // add a new frame to the trace
+
+		for(unsigned int i = 1 ; i < k ; ++i) {
+			std::vector<Clause *> * c = frames[i];
+			for (unsigned int j = 0 ; j < c->size() ; ++j) {
+				solver->push(1);
+				solver->add_assertion("(assert (and frame[i] c[j] trans (not c[j]')))");
+				if (solver->check_sat() == Solver::unsat)
+					frames[i+1]->push_back((*c)[j]);
+			}
+			// compare frames[i] and frames[i+1]
+		}
+	}
+
+	return false;
 }
 
 IC3::~IC3() {

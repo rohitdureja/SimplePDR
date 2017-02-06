@@ -51,5 +51,5 @@ public:
 	 */
 	std::vector<signed char> * get_literals();
 };
-
+typedef Clause Cube;
 #endif /* UTILS_H_ */

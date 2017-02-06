@@ -22,12 +22,47 @@
 
 #include "model.h"
 #include "solver.h"
+#include <vector>
+#include "utils.h"
 
 namespace IC3 {
 
 class IC3 {
 private:
+	// Z3 solver instance
 	Solver::Solver * solver;
+
+	 /* Keep track of IC3 frames:
+	  * Data structure is a vector of pointers to a vector of pointers
+	  * to clauses.
+	  *
+	  * Reference use:
+	  * frames.push_back(M->get_init()); 		// push init to frame[0]
+	  *
+	  * std::vector<Clause *> * c = frames[0]; 	// get vector containing
+	  * 									   	// pointers to clauses of
+	  * 									   	// frame[0]
+	  *
+	  * std::cout << c->size() << std::endl;
+	  * for (unsigned int j = 0 ; j <c->size() ; ++j) {
+	  * 	Clause * f = (*c)[j]; 				// get j-th of clause of
+	  * 										// frame[0]
+	  *
+	  * 	std::vector<signed char> * lit; 	// pointer to a vector of
+	  * 										// literals.
+	  *
+	  * 	lit = f->get_literals();  			// make lit point to literals in
+	  * 							  			// j-th clause of frame[0]
+	  *
+	  * 	for (unsigned int i = 0 ; i < lit->size() ; ++i)
+	  * 	std::cout << (*lit)[i] << std::endl;
+	  * }
+	  */
+	std::vector<std::vector<Clause *> *> frames;
+	std::vector<Clause *> * init;
+	std::vector<Clause *> * trans;
+
+	bool rec_block(Cube *, unsigned int);
 public:
 	IC3(Model *);
 	bool prove();

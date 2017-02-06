@@ -24,21 +24,19 @@
 namespace Solver {
 
 Solver::Solver() {
-	c = new z3::context();
-	s = new z3::solver(*c);
+	s = new z3::solver(c);
 	nsymbols = 0;
-//	Solver::add_symbol(Boolean);
 }
 
 void Solver::add_symbol(const std::string & symbol, const type tsort) {
 	// Create sort vector
-	z3::sort_vector sort_v(*c);
+	z3::sort_vector sort_v(c);
 	// Add data to vector names and funcs
 	// Recommended usage for adding smtlib strings to solver instance
 	// Creates objects used by the C API
-	names.push_back(c->str_symbol(symbol.c_str()));
-	funcs.push_back(c->function(names[nsymbols], sort_v,
-			tsort == Boolean ? c->bool_sort() : c->int_sort()));
+	names.push_back(c.str_symbol(symbol.c_str()));
+	funcs.push_back(c.function(names[nsymbols], sort_v,
+			tsort == Boolean ? c.bool_sort() : c.int_sort()));
 	// operator Z3_*** are convert types from C to C++
 	symbols.push_back(names[nsymbols].operator Z3_symbol());
 	decls.push_back(funcs[nsymbols].operator Z3_func_decl());
@@ -47,12 +45,11 @@ void Solver::add_symbol(const std::string & symbol, const type tsort) {
 
 void Solver::add_assertion(const std::string assertion) {
 	// Parse the passed SMTLIB2 expression
-	std::cout << "here" << std::endl;
-	Z3_ast parsed1 = Z3_parse_smtlib2_string(*c, assertion.c_str(),
+	Z3_ast parsed1 = Z3_parse_smtlib2_string(c, assertion.c_str(),
 			0, 0, 0, nsymbols, symbols.data(), decls.data());
 	// convert the parsed SMTLIB2 (C object) to an expr object for
 	// the C++ interface
-	z3::expr formula(*c, parsed1);
+	z3::expr formula(c, parsed1);
 	s->add(formula);
 	std::cout << *s << "\n";
 }
@@ -78,7 +75,7 @@ void Solver::pop(const unsigned int step) {
 
 std::string Solver::get_model() {
 	z3::model m = s->get_model();
-	return Z3_model_to_string(*c, m);
+	return Z3_model_to_string(c, m);
 }
 
 Solver::~Solver() {
