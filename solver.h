@@ -43,7 +43,7 @@ public:
 	virtual ~Solver();
 	void push(const unsigned int);
 	void pop(const unsigned int);
-	void add_symbol(const std::string,const type);
+	void add_symbol(const std::string &,const type);
 	void add_assertion(const std::string);
 	result check_sat();
 	std::string get_model();

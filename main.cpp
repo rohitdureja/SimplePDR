@@ -26,6 +26,9 @@ int main() {
 	M->add_variable("x");
 	M->add_variable("y");
 	M->add_variable("z");
+	M->add_variable("xn");
+		M->add_variable("yn");
+		M->add_variable("zn");
 	M->add_clause("trans", "!x|z");
 	M->add_clause("trans", "!y|!z");
 	M->add_clause("trans", "x|!y");
@@ -36,11 +39,11 @@ int main() {
 	IC3::IC3 * ic3_instance = new IC3::IC3(M);
 
 	// Run the IC3 algorithm
-	ic3_instance->prove();
+//	ic3_instance->prove();
 
 	// Clean up
-	delete M;
 	delete ic3_instance;
+	delete M;
 
 	return 0;
 }

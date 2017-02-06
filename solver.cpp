@@ -30,10 +30,9 @@ Solver::Solver() {
 //	Solver::add_symbol(Boolean);
 }
 
-void Solver::add_symbol(const std::string symbol, const type tsort) {
+void Solver::add_symbol(const std::string & symbol, const type tsort) {
 	// Create sort vector
 	z3::sort_vector sort_v(*c);
-
 	// Add data to vector names and funcs
 	// Recommended usage for adding smtlib strings to solver instance
 	// Creates objects used by the C API
@@ -48,9 +47,9 @@ void Solver::add_symbol(const std::string symbol, const type tsort) {
 
 void Solver::add_assertion(const std::string assertion) {
 	// Parse the passed SMTLIB2 expression
+	std::cout << "here" << std::endl;
 	Z3_ast parsed1 = Z3_parse_smtlib2_string(*c, assertion.c_str(),
 			0, 0, 0, nsymbols, symbols.data(), decls.data());
-
 	// convert the parsed SMTLIB2 (C object) to an expr object for
 	// the C++ interface
 	z3::expr formula(*c, parsed1);
@@ -64,6 +63,7 @@ result Solver::check_sat() {
 	case z3::sat: std::cout << "sat" << std::endl; return sat;
 	default: std::cout << "unknown" << std::endl; return unknown;
 	}
+
 }
 
 void Solver::push(const unsigned int step) {
