@@ -21,31 +21,33 @@
 #include "IC3.h"
 
 int main() {
-	// Specify transition system
-	Model *M = new Model();
-	M->add_variable("x");
-	M->add_variable("y");
-	M->add_variable("z");
-	M->add_variable("xn");
-		M->add_variable("yn");
-		M->add_variable("zn");
-	M->add_clause("trans", "!x|z");
-	M->add_clause("trans", "!y|!z");
-	M->add_clause("trans", "x|!y");
-	M->add_clause("init", "!x|y");
-	M->add_clause("init", "z");
+    // Specify transition system
+    Model *M = new Model();
+    M->add_variable("x");
+    M->add_variable("y");
+    M->add_variable("z");
+    M->add_variable("nx");
+    M->add_variable("ny");
+    M->add_variable("nz");
+    M->add_clause("trans", "!x|z");
+    M->add_clause("trans", "!y|!z");
+    M->add_clause("trans", "nx|!ny|z");
+    M->add_clause("trans", "!z");
 
-	// Create IC3 instance
-	IC3::IC3 * ic3_instance = new IC3::IC3(M);
+    M->add_clause("init", "!x|y");
+    M->add_clause("init", "!nz");
 
-	// Run the IC3 algorithm
+    // Create IC3 instance
+    IC3::IC3 * ic3_instance = new IC3::IC3(M);
+
+    // Run the IC3 algorithm
 //	ic3_instance->prove();
 
-	// Clean up
-	delete ic3_instance;
-	delete M;
+// Clean up
+    delete ic3_instance;
+    delete M;
 
-	return 0;
+    return 0;
 }
 
 // 2017-01-31

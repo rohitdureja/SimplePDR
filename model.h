@@ -34,38 +34,39 @@
  * initial state (in CNF).
  */
 class Model {
-	/*
-	 * Vector containing pointer to clauses clauses for the
-	 * transition system.
-	 */
-	std::vector<Clause*> trans;
-	std::vector<Clause*> init;
+    /*
+     * Vector containing pointer to clauses clauses for the
+     * transition system.
+     */
+    std::vector<Clause*> trans;
+    std::vector<Clause*> init;
 
-	// Helpers objects
-	std::map<std::string, unsigned char> var_map1; //	name -> int
-	std::map<unsigned char, std::string> var_map2; //	int -> name
-	std::vector<std::string> str_vars;
-	int8_t vcount;
+    // Helpers objects
+    std::map<std::string, unsigned char> var_map1; //	name -> int
+    std::map<unsigned char, std::string> var_map2; //	int -> name
+    std::vector<std::string> str_vars;
+    unsigned char vcount;
 
 public:
 
-	Model() {
-		vcount = 100;
-	}
-	~Model() {
-		for(unsigned char i = 0 ; i < trans.size() ; ++i)
-			delete trans[i];
-		for(unsigned char i = 0 ; i < init.size() ; ++i)
-			delete init[i];
-	}
+    Model() {
+        vcount = 1;
+    }
+    ~Model() {
+        for (unsigned char i = 0; i < trans.size(); ++i)
+            delete trans[i];
+        for (unsigned char i = 0; i < init.size(); ++i)
+            delete init[i];
+    }
 
-	std::vector<std::string> * get_variables();
-	void add_variable(const std::string);
-	void add_clause(const std::string, const std::string);
-	std::vector<Clause *> * get_trans();
-	std::vector<Clause *> * get_init();
-	void show_trans();
-	void show_init();
+    std::vector<std::string> * get_variables();
+    void add_variable(const std::string);
+    void add_clause(const std::string, const std::string);
+    std::vector<Clause *> * get_trans();
+    std::vector<Clause *> * get_init();
+    void show_trans();
+    void show_init();
+    std::map<unsigned char, std::string> * get_var_map();
 };
 
 #endif /* MODEL_H_ */

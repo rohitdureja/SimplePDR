@@ -24,62 +24,69 @@
 namespace Solver {
 
 Solver::Solver() {
-	s = new z3::solver(c);
-	nsymbols = 0;
+    s = new z3::solver(c);
+    nsymbols = 0;
 }
 
 void Solver::add_symbol(const std::string & symbol, const type tsort) {
-	// Create sort vector
-	z3::sort_vector sort_v(c);
-	// Add data to vector names and funcs
-	// Recommended usage for adding smtlib strings to solver instance
-	// Creates objects used by the C API
-	names.push_back(c.str_symbol(symbol.c_str()));
-	funcs.push_back(c.function(names[nsymbols], sort_v,
-			tsort == Boolean ? c.bool_sort() : c.int_sort()));
-	// operator Z3_*** are convert types from C to C++
-	symbols.push_back(names[nsymbols].operator Z3_symbol());
-	decls.push_back(funcs[nsymbols].operator Z3_func_decl());
-	nsymbols++;
+    // Create sort vector
+    z3::sort_vector sort_v(c);
+    // Add data to vector names and funcs
+    // Recommended usage for adding smtlib strings to solver instance
+    // Creates objects used by the C API
+    names.push_back(c.str_symbol(symbol.c_str()));
+    funcs.push_back(
+            c.function(names[nsymbols], sort_v,
+                    tsort == Boolean ? c.bool_sort() : c.int_sort()));
+    // operator Z3_*** are convert types from C to C++
+    symbols.push_back(names[nsymbols].operator Z3_symbol());
+    decls.push_back(funcs[nsymbols].operator Z3_func_decl());
+    nsymbols++;
 }
 
 void Solver::add_assertion(const std::string assertion) {
-	// Parse the passed SMTLIB2 expression
-	Z3_ast parsed1 = Z3_parse_smtlib2_string(c, assertion.c_str(),
-			0, 0, 0, nsymbols, symbols.data(), decls.data());
-	// convert the parsed SMTLIB2 (C object) to an expr object for
-	// the C++ interface
-	z3::expr formula(c, parsed1);
-	s->add(formula);
-	std::cout << *s << "\n";
+    // Parse the passed SMTLIB2 expression
+    Z3_ast parsed1 = Z3_parse_smtlib2_string(c, assertion.c_str(), 0, 0, 0,
+            nsymbols, symbols.data(), decls.data());
+    // convert the parsed SMTLIB2 (C object) to an expr object for
+    // the C++ interface
+    z3::expr formula(c, parsed1);
+    s->add(formula);
+    std::cout << *s << "\n";
 }
 
 result Solver::check_sat() {
-	switch (s->check()) {
-	case z3::unsat:	std::cout << "unsat" << std::endl; return unsat;
-	case z3::sat: std::cout << "sat" << std::endl; return sat;
-	default: std::cout << "unknown" << std::endl; return unknown;
-	}
+    switch (s->check()) {
+    case z3::unsat:
+        std::cout << "unsat" << std::endl;
+        return unsat;
+    case z3::sat:
+        std::cout << "sat" << std::endl;
+        return sat;
+    default:
+        std::cout << "unknown" << std::endl;
+        return unknown;
+    }
 
 }
 
 void Solver::push(const unsigned int step) {
-	for (unsigned int i = 0 ; i < step ; ++i)
-		s->push();
+    for (unsigned int i = 0; i < step; ++i)
+        s->push();
 }
 
 void Solver::pop(const unsigned int step) {
-	for (unsigned int i = 0 ; i < step ; ++i)
-		s->pop();
+    for (unsigned int i = 0; i < step; ++i)
+        s->pop();
 }
 
 std::string Solver::get_model() {
-	z3::model m = s->get_model();
-	return Z3_model_to_string(c, m);
+    z3::model m = s->get_model();
+    return Z3_model_to_string(c, m);
 }
 
 Solver::~Solver() {
-	delete s;
+    delete s;
 }
 
 } /* namespace Solver */

@@ -20,10 +20,11 @@
 #include "utils.h"
 #include <sstream>
 
-void split(const std::string &s, const char* delim, std::vector<std::string> & v){
+void split(const std::string &s, const char* delim,
+        std::vector<std::string> & v) {
     char * dup = strdup(s.c_str());
     char * token = std::strtok(dup, delim);
-    while(token != NULL){
+    while (token != NULL) {
         v.push_back(std::string(token));
         token = std::strtok(NULL, delim);
     }
@@ -34,11 +35,11 @@ void split(const std::string &s, const char* delim, std::vector<std::string> & v
  *
  */
 void Clause::add_literal(signed char literal) {
-	literals.push_back(literal);
+    literals.push_back(literal);
 }
 
 std::vector<signed char> * Clause::get_literals() {
-	return &literals;
+    return &literals;
 }
 
 // utility to convert anthing to a string
@@ -46,4 +47,36 @@ template<typename T> std::string tostring(const T& x) {
     std::ostringstream os;
     os << x;
     return os.str();
+}
+
+/* Utility to generate SMTLIB2 strings for each clause in the
+ * passed vector
+ */
+void generate_smtlib2_string(std::vector<Clause *> * clauses,
+        std::vector<std::string> &str_clause,
+        std::map<unsigned char, std::string> * map) {
+    for (unsigned int i = 0; i < clauses->size(); ++i) {
+        Clause * clause = (*clauses)[i]; // get i-th clause
+        std::vector<signed char> * literals = clause->get_literals();
+        if (literals->size() == 1) {
+            str_clause.push_back("(assert");
+            str_clause[i] =
+                    (*literals)[0] > 0 ?
+                            str_clause[i] + " " + (*map)[(*literals)[0]] :
+                            str_clause[i] + " (not " + (*map)[-(*literals)[0]]
+                                    + ")";
+            str_clause[i] = str_clause[i] + ")";
+        } else {
+            str_clause.push_back("(assert (or");
+            // iterative over literals in i-th clause
+            for (unsigned int j = 0; j < literals->size(); ++j) {
+                str_clause[i] =
+                        (*literals)[j] > 0 ?
+                                str_clause[i] + " " + (*map)[(*literals)[j]] :
+                                str_clause[i] + " (not "
+                                        + (*map)[-(*literals)[j]] + ")";
+            }
+            str_clause[i] = str_clause[i] + "))";
+        }
+    }
 }

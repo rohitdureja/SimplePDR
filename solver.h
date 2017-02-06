@@ -26,27 +26,31 @@
 
 namespace Solver {
 
-enum result {sat, unsat, unknown};
-enum type {Integer, Boolean};
+enum result {
+    sat, unsat, unknown
+};
+enum type {
+    Integer, Boolean
+};
 
 class Solver {
 private:
-	z3::context c;
-	z3::solver * s;
-	unsigned int nsymbols;
-	std::vector<z3::symbol> names;
-	std::vector<Z3_symbol> symbols;
-	std::vector<z3::func_decl> funcs;
-	std::vector<Z3_func_decl> decls;
+    z3::context c;
+    z3::solver * s;
+    unsigned int nsymbols;
+    std::vector<z3::symbol> names;
+    std::vector<Z3_symbol> symbols;
+    std::vector<z3::func_decl> funcs;
+    std::vector<Z3_func_decl> decls;
 public:
-	Solver();
-	virtual ~Solver();
-	void push(const unsigned int);
-	void pop(const unsigned int);
-	void add_symbol(const std::string &,const type);
-	void add_assertion(const std::string);
-	result check_sat();
-	std::string get_model();
+    Solver();
+    virtual ~Solver();
+    void push(const unsigned int);
+    void pop(const unsigned int);
+    void add_symbol(const std::string &, const type);
+    void add_assertion(const std::string);
+    result check_sat();
+    std::string get_model();
 };
 
 } /* namespace Solver */
