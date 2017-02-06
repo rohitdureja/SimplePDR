@@ -83,7 +83,6 @@ std::string Solver::get_model() {
 
 Solver::~Solver() {
 	delete s;
-	delete c;
 }
 
 } /* namespace Solver */

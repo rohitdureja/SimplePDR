@@ -26,42 +26,32 @@ IC3::IC3(Model *M) {
 	M->show_trans();
 	solver = new Solver::Solver();
 
-	// add current state variables to SAT solver
-//	for (unsigned int i = 0; i < (*M->get_variables()).size(); ++i) {
-//		solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
-//	}
-	solver->add_symbol("x", Solver::Boolean);
-	solver->add_symbol("y", Solver::Boolean);
-	solver->add_symbol("z", Solver::Boolean);
+	for (unsigned int i = 0; i < (*M->get_variables()).size(); ++i) {
+		solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
+	}
 
-//	// add next state variables to SAT solver
-//	for (unsigned int i = 0; i < vars->size(); ++i)
-//		solver->add_symbol((*vars)[i]+"n", Solver::Boolean);
+	solver->add_assertion("(assert (= x y))");
+	solver->add_assertion("(assert (= (not x) z))");
 
+	Solver::result res;
+	res = solver->check_sat();
+	if (res == Solver::sat) {
+		std::cout << solver->get_model() << std::endl;
+	}
 
-//	solver->add_assertion("(assert (= x y))");
-//	solver->add_assertion("(assert (= (not x) z))");
-//
-//	Solver::result res;
-//	res = solver->check_sat();
-//	if (res == Solver::sat) {
-//		std::cout << solver->get_model() << std::endl;
-//	}
-//
-//	solver->push(1);
-//	solver->add_assertion("(assert (= x z))");
-//	res = solver->check_sat();
-//	if (res == Solver::sat) {
-//		std::cout << solver->get_model() << std::endl;
-//	}
-//
-//	solver->pop(1);
-//	solver->add_assertion("(assert (= x y z))");
-//	res = solver->check_sat();
-//	if (res == Solver::sat) {
-//		std::cout << solver->get_model() << std::endl;
-//	}
-	prove();
+	solver->push(1);
+	solver->add_assertion("(assert (= x z))");
+	res = solver->check_sat();
+	if (res == Solver::sat) {
+		std::cout << solver->get_model() << std::endl;
+	}
+
+	solver->pop(1);
+	solver->add_assertion("(assert (= x y z))");
+	res = solver->check_sat();
+	if (res == Solver::sat) {
+		std::cout << solver->get_model() << std::endl;
+	}
 }
 
 /*
@@ -93,29 +83,6 @@ IC3::IC3(Model *M) {
 
 // TODO: Implement data structure to maintain frames
 bool IC3::prove() {
-	std::cout << "here" << std::endl;
-	solver->add_assertion("(assert (= x y))");
-		solver->add_assertion("(assert (= (not x) z))");
-
-		Solver::result res;
-		res = solver->check_sat();
-		if (res == Solver::sat) {
-			std::cout << solver->get_model() << std::endl;
-		}
-
-		solver->push(1);
-		solver->add_assertion("(assert (= x z))");
-		res = solver->check_sat();
-		if (res == Solver::sat) {
-			std::cout << solver->get_model() << std::endl;
-		}
-
-		solver->pop(1);
-		solver->add_assertion("(assert (= x y))");
-		res = solver->check_sat();
-		if (res == Solver::sat) {
-			std::cout << solver->get_model() << std::endl;
-		}
 		return true;
 }
 
