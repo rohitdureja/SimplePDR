@@ -50,6 +50,7 @@ class Model {
     // Helpers objects
     std::map<std::string, unsigned char> var_map1; //	name -> int
     std::map<unsigned char, std::string> var_map2; //	int -> name
+    std::map<std::string, std::string> var_rel; //   curr -> next
     std::vector<std::string> str_vars;
     unsigned char vcount;
 
@@ -69,6 +70,9 @@ public:
 
     std::vector<std::string> * get_variables();
     void add_variable(const std::string);
+    void add_variable_relation(const std::string,
+                                      const std::string);
+
     void add_clause(const type, const std::string);
     std::vector<Clause *> * get_trans();
     std::vector<Clause *> * get_init();
@@ -77,6 +81,7 @@ public:
     void show_init();
     std::map<unsigned char, std::string> * get_var_map2();
     std::map<std::string, unsigned char> * get_var_map1();
+    std::map<std::string, std::string> * get_var_rel_map();
 };
 
 }

@@ -28,6 +28,7 @@ IC3::IC3(Model::Model *M) {
 
     map1 = M->get_var_map1();
     map2 = M->get_var_map2();
+    nmap = M->get_var_rel_map();
 
     for (unsigned int i = 0; i < (*M->get_variables()).size(); ++i) {
         solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
@@ -41,6 +42,7 @@ IC3::IC3(Model::Model *M) {
 
     // get pointer to transition relation
     prop = M->get_prop();
+
 }
 
 /*
@@ -204,10 +206,33 @@ bool IC3::prove() {
     k = k + 1;
     frames.push_back(new std::vector<Clause *>); // add a new frame to the trace
 
+    /* New solver stack created since trans is always present
+     * in subsequent calls to Z3 (next for loop) */
+    solver->push(); // create solver stack
+
+    // get SMT2 string corresponding to trans
+    SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2);
+
+#ifdef DEBUG
+    std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
+    for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+    std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+    // iterate over the SMT2 strings for each clause
+    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+        std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+        solver->add_assertion(cnf_smt2[i]); // add clause to solver
+    }
+    cnf_smt2.clear(); // clear strings
+
     for (unsigned int i = 1; i < k; ++i) {
-        std::cout << i << std::endl;
         std::vector<Clause *> * cl = frames[i];
 
+        /* New solver stack created since frames[i] is present
+         * in all iterations of the next for loop */
         solver->push(); // create solver stack
 
         // get SMT2 string corresponding to frames[i]
@@ -228,26 +253,65 @@ bool IC3::prove() {
         }
         cnf_smt2.clear(); // clear strings
 
-        // get SMT2 string corresponding to trans
-        SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2);
+        // Iterate over all clauses in frames[i];
+        for (unsigned j = 0; j < cl->size(); ++j) {
+            /* New solver stack created for adding cl[i] to solver */
+            solver->push(); // create solver stack
+
+            // get SMT2 string corresponding to cl[j]
+            std::vector<Clause *> * m = new std::vector<Clause *>;
+            m->push_back((*cl)[j]);
+            SMTLIB2::generate_smtlib2_from_clause(m, cnf_smt2, map2);
 
 #ifdef DEBUG
-        std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
-        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+            std::cout << "IC3::clause[" << j << "] in frames[" << i << "]" << std::endl;
+            for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
             std::cout << "IC3::" << cnf_smt2[i] << std::endl;
 #endif
 
-        // iterate over the SMT2 strings for each clause
-        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+            // iterate over the SMT2 strings for each clause
+            for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
 #ifdef DEBUG
-            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+                std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
 #endif
-            solver->add_assertion(cnf_smt2[i]); // add clause to solver
-        }
-        cnf_smt2.clear(); // clear strings
+                solver->add_assertion(cnf_smt2[i]); // add clause to solver
+            }
+            cnf_smt2.clear(); // clear strings
 
-        std::cout << cl->size() << std::endl;
+            // get SMT2 string corresponding to (not cl[j]')
+            SMTLIB2::generate_smtlib2_from_clause(m, cnf_smt2, map2, SMTLIB2::comp, nmap);
+
+#ifdef DEBUG
+            std::cout << "IC3::(not clause[" << j << "]') in frames[" << i << "]" << std::endl;
+            for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+            std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+            // iterate over the SMT2 strings for each clause
+            for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+                std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+                solver->add_assertion(cnf_smt2[i]); // add clause to solver
+            }
+            cnf_smt2.clear(); // clear strings
+
+            // propagate forward from frames[i] to frames[i+1]
+            if(solver->check_sat() == Solver::unsat) {
+//                Clause * c = new Clause((*m)[0]);
+                frames[i+1]->push_back((*m)[0]);
+            }
+
+            /* Solver stack destroyed to remove cl[i] */
+            solver->pop(); // destroy solver stack
+        }
+
+        /* Solver stack destroyed to remove frame[i] */
+        solver->pop(); // destroy solver stack
+
     }
+    /* Solver stack destroyed to remove trans */
+    solver->pop(); // destroy solver stack
 
 //
 //        for (unsigned int i = 1; i < k; ++i) {
@@ -268,6 +332,16 @@ bool IC3::prove() {
 
 bool IC3::check_proof_obligation(std::vector<Clause *> & s, unsigned int k) {
 
+    Clause *c = new Clause;
+    c->add_literal((*map1)["a"]);
+    c->add_literal((*map1)["b"]);
+    frames[k]->push_back(c);
+
+    Clause *b = new Clause;
+        b->add_literal(-(*map1)["a"]);
+        b->add_literal((*map1)["b"]);
+        frames[k]->push_back(b);
+
     // clear memory
     for (unsigned int i = 0; i < s.size(); ++i)
         delete s[i];
@@ -277,13 +351,15 @@ IC3::~IC3() {
     delete solver;
 
     // delete frames
-    // we don't delete frame[0] here as it is deleted with init
     for(unsigned int i = 1 ; i < frames.size() ; ++i) {
-        std::vector<Clause *> * cl = frames[i];
-        for (unsigned int j = 1 ; j < cl->size() ; ++j)
-            delete (*cl)[j];
-        delete frames[i];
-
+        std::cout << "Frame " << i << " size: " << frames[i]->size() << std::endl;
+        for(unsigned int j = 0 ; j < frames[i]->size() ; ++j) {
+            std::vector<Clause *> * c = frames[i];
+            std::cout << "Clause " << j << " size: " << c->size() << std::endl;
+            for (unsigned int k = 0 ; k < c->size() ; ++k) {
+                std::cout << (*c)[k] << std::endl;
+            }
+        }
     }
 }
 

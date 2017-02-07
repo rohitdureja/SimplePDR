@@ -64,6 +64,7 @@ private:
     std::vector<Clause *> * prop;
     std::map<std::string, unsigned char> * map1;
     std::map<unsigned char, std::string> * map2;
+    std::map<std::string, std::string> * nmap;
 
     bool check_proof_obligation(std::vector<Clause *> &, unsigned int);
 public:

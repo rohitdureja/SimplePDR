@@ -29,6 +29,10 @@ void Model::add_variable(const std::string var_name) {
     vcount = vcount + 1;
 }
 
+void Model::add_variable_relation(const std::string curr, const std::string next) {
+    var_rel[curr] = next;
+}
+
 void Model::add_clause(const type ctype,
                        const std::string clause) {
     Clause *c = new Clause();
@@ -95,6 +99,10 @@ std::map<unsigned char, std::string> * Model::get_var_map2() {
 
 std::map<std::string, unsigned char> * Model::get_var_map1() {
     return &var_map1;
+}
+
+std::map<std::string, std::string> * Model::get_var_rel_map() {
+    return &var_rel;
 }
 
 } /* namespace Model */

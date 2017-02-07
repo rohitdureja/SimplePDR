@@ -30,6 +30,10 @@ int main() {
     M->add_variable("na");
     M->add_variable("nb");
 
+    // add current and next state variable relations
+    M->add_variable_relation("a", "na");
+    M->add_variable_relation("b", "nb");
+
     // initial states
     M->add_clause(Model::I, "!a");
     M->add_clause(Model::I, "!b");

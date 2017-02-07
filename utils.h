@@ -37,6 +37,10 @@ class Clause {
      */
     std::vector<signed char> literals;
 public:
+    // default constructor
+    Clause();
+    // copy constructor
+    Clause(Clause *);
     /*
      * Member function to add a literal to a clause
      * \param t The value to write
@@ -60,7 +64,8 @@ void generate_smtlib2_from_clause(
         std::vector<Clause *> *,
         std::vector<std::string> &,
         std::map<unsigned char, std::string> *,
-        smt_str_type type = uncomp);
+        smt_str_type type = uncomp,
+        std::map<std::string, std::string> * nmap = NULL);
 
 // generate vector of clause pointers from SMT string
 void generate_clause_from_smtlib2(
