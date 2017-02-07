@@ -24,10 +24,6 @@
 #include <vector>
 #include <map>
 
-// utility to convert anthing to a string
-template<typename T>
-std::string tostring(const T& x);
-
 void split(const std::string &s, const char* delim,
         std::vector<std::string> & v);
 
@@ -54,9 +50,24 @@ public:
     std::vector<signed char> * get_literals();
 };
 
+namespace SMTLIB2 {
+enum smt_str_type {
+    comp,
+    uncomp
+};
 // generate SMT string from a passed pointer vector of clause pointers
-void generate_smtlib2_string(std::vector<Clause *> *,
-        std::vector<std::string> &, std::map<unsigned char, std::string> *);
+void generate_smtlib2_from_clause(
+        std::vector<Clause *> *,
+        std::vector<std::string> &,
+        std::map<unsigned char, std::string> *,
+        smt_str_type type = uncomp);
+
+// generate vector of clause pointers from SMT string
+void generate_clause_from_smtlib2(
+        std::vector<Clause *> & ,
+        std::vector<std::string>,
+        std::map<std::string, unsigned char> *);
+}
 
 typedef Clause Cube;
 #endif /* UTILS_H_ */

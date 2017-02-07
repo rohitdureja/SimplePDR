@@ -61,9 +61,11 @@ private:
     std::vector<std::vector<Clause *> *> frames;
     std::vector<Clause *> * init;
     std::vector<Clause *> * trans;
-    std::map<unsigned char, std::string> * map;
+    std::vector<Clause *> * prop;
+    std::map<std::string, unsigned char> * map1;
+    std::map<unsigned char, std::string> * map2;
 
-    bool rec_block(Cube *, unsigned int);
+    bool check_proof_obligation(std::vector<Clause *> &, unsigned int);
 public:
     IC3(Model::Model *);
     bool prove();

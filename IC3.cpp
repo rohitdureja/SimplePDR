@@ -23,9 +23,11 @@ namespace IC3 {
 
 IC3::IC3(Model::Model *M) {
 //	M->show_init();
-    M->show_trans();
+//    M->show_trans();
     solver = new Solver::Solver();
-    map = M->get_var_map();
+
+    map1 = M->get_var_map1();
+    map2 = M->get_var_map2();
 
     for (unsigned int i = 0; i < (*M->get_variables()).size(); ++i) {
         solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
@@ -37,15 +39,15 @@ IC3::IC3(Model::Model *M) {
     // get pointer to transition relation
     trans = M->get_trans();
 
-    std::vector<std::string> smt2;
-    generate_smtlib2_string(trans, smt2, map);
-    for (unsigned int i = 0; i < smt2.size(); ++i) {
-        solver->add_assertion(smt2[i]);
-    }
-    smt2.clear();
+    // get pointer to transition relation
+    prop = M->get_prop();
 
-//	solver->add_assertion("(assert (= x y))");
-//	solver->add_assertion("(assert (= (not x) z))");
+//    std::vector<std::string> smt2;
+//    generate_smtlib2_string(trans, smt2, map);
+//    for (unsigned int i = 0; i < smt2.size(); ++i) {
+//        solver->add_assertion(smt2[i]);
+//    }
+//    smt2.clear();
 //
 //	Solver::result res;
 //	res = solver->check_sat();
@@ -58,26 +60,10 @@ IC3::IC3(Model::Model *M) {
 //        solver->add_assertion(smt2[i]);
 //    }
 //
-////  solver->add_assertion("(assert (= x y))");
-////  solver->add_assertion("(assert (= (not x) z))");
 //    res = solver->check_sat();
 //    if (res == Solver::sat) {
 //        std::cout << solver->get_model() << std::endl;
 //    }
-
-//	solver->push(1);
-//	solver->add_assertion("(assert (= x z))");
-//	res = solver->check_sat();
-//	if (res == Solver::sat) {
-//		std::cout << solver->get_model() << std::endl;
-//	}
-//
-//	solver->pop(1);
-//	solver->add_assertion("(assert (= x y z))");
-//	res = solver->check_sat();
-//	if (res == Solver::sat) {
-//		std::cout << solver->get_model() << std::endl;
-//	}
 }
 
 /*
@@ -108,12 +94,58 @@ IC3::IC3(Model::Model *M) {
  */
 
 bool IC3::prove() {
-    // find 0-step counterexample
-    solver->push(1);
-    solver->add_assertion("(assert (and init (not prop)))");
+    // helper string vector to hold SMTLIB2 formulas
+    std::vector<std::string> cnf_smt2;
+
+    /***************** find 0-step counterexample ******************
+     ************************ starts here **************************/
+
+    solver->push(); // create solver stack
+
+    // get SMT2 string corresponding to init
+    SMTLIB2::generate_smtlib2_from_clause(init, cnf_smt2, map2);
+
+#ifdef DEBUG
+    std::cout << "IC3::Initial State (size = " << cnf_smt2.size()
+              << ")" << std::endl;
+    for(unsigned int i = 0 ; i < cnf_smt2.size() ; ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+    // iterate over the SMT2 strings for each clause
+    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+    std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+        solver->add_assertion(cnf_smt2[i]); // add clause to solver
+    }
+    cnf_smt2.clear(); // clear strings
+
+    // get SMT2 string corresponding to (not prop)
+    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp);
+
+#ifdef DEBUG
+    std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
+              << ")" << std::endl;
+    for(unsigned int i = 0 ; i < cnf_smt2.size() ; ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+    // iterate over the SMT2 strings for each clause
+    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+    std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+        solver->add_assertion(cnf_smt2[i]); // add clause to solver
+    }
+    cnf_smt2.clear();
+
+    // checks satisfiability of (I \wedge \not P)
     if (solver->check_sat() == Solver::sat)
+        // TODO: extract witness when 0-step cex exists
         return false;
-    solver->pop(1);
+    solver->pop();  // destroy solver stack
+
+    /***************** find 0-step counterexample ******************
+     ************************* ends here ***************************/
 
     // first element of frame is init formula
     frames.push_back(init);
@@ -121,38 +153,107 @@ bool IC3::prove() {
     unsigned int k = 1; // active frame number
     frames.push_back(NULL); // add a new frame to the trace
 
-    while (false) {
-        // blocking phase
-        solver->push(1);
-        solver->add_assertion("(assert (and frame[k] (not prop)))");
-        while (solver->check_sat() == Solver::sat) {
-            std::string model = solver->get_model();
-            solver->pop(1);
-            if (!rec_block(NULL, k))
-                return false;
-        }
+    //TODO: uncomment this while
+//    while (false) {
 
-        // propagation phase
-        k = k + 1; // move to next frame
-        frames.push_back(NULL); // add a new frame to the trace
+    /*********************** blocking phase **************************
+     ************************* starts here ***************************/
+        solver->push(); // create solver stack
 
-        for (unsigned int i = 1; i < k; ++i) {
-            std::vector<Clause *> * c = frames[i];
-            for (unsigned int j = 0; j < c->size(); ++j) {
-                solver->push(1);
-                solver->add_assertion(
-                        "(assert (and frame[i] c[j] trans (not c[j]')))");
-                if (solver->check_sat() == Solver::unsat)
-                    frames[i + 1]->push_back((*c)[j]);
-            }
-            // compare frames[i] and frames[i+1]
-        }
-    }
+        // get SMT2 string corresponding to frames[k]
+        SMTLIB2::generate_smtlib2_from_clause(frames[k], cnf_smt2, map2);
+
+#ifdef DEBUG
+       std::cout << "IC3::Frame (step = " << k << ")" << std::endl;
+       for(unsigned int i = 0 ; i < cnf_smt2.size() ; ++i)
+           std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+       // iterate over the SMT2 strings for each clause
+       for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+               std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+           solver->add_assertion(cnf_smt2[i]); // add clause to solver
+       }
+       cnf_smt2.clear(); // clear strings
+
+       // get SMT2 string corresponding to (not prop)
+       SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp);
+
+#ifdef DEBUG
+       std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
+                 << ")" << std::endl;
+       for(unsigned int i = 0 ; i < cnf_smt2.size() ; ++i)
+           std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+       // iterate over the SMT2 strings for each clause
+       for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+               std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+           solver->add_assertion(cnf_smt2[i]); // add clause to solver
+       }
+       cnf_smt2.clear();
+
+       // checks satisfiability of (and frames[k] (not prop))
+       //TODO: the below "if" needs to be "while"
+       if (solver->check_sat() == Solver::sat) {
+
+           // get model corresponding to bad cube c
+           std::vector<std::string> bad_cube = solver->get_model();
+#ifdef DEBUG
+           std::cout << "IC3::Bad cube found!\n";
+           for(unsigned int i = 0 ; i < bad_cube.size() ; ++i)
+               std::cout << "IC3::" << bad_cube[i] << std::endl;
+#endif
+           solver->pop(); // destroy solver stack
+
+           // convert bad cube to multiple clauses
+           std::vector<Clause *> c;
+           SMTLIB2::generate_clause_from_smtlib2(c, bad_cube, map1);
+
+           if (!check_proof_obligation(c, k)) {
+
+           }
+
+
+       }
+
+
+//        solver->add_assertion("(assert (and frame[k] (not prop)))");
+//        while (solver->check_sat() == Solver::sat) {
+//            std::string model = solver->get_model();
+//            solver->pop(1);
+//            if (!rec_block(NULL, k))
+//                return false;
+//        }
+//
+//        // propagation phase
+//        k = k + 1; // move to next frame
+//        frames.push_back(NULL); // add a new frame to the trace
+//
+//        for (unsigned int i = 1; i < k; ++i) {
+//            std::vector<Clause *> * c = frames[i];
+//            for (unsigned int j = 0; j < c->size(); ++j) {
+//                solver->push(1);
+//                solver->add_assertion(
+//                        "(assert (and frame[i] c[j] trans (not c[j]')))");
+//                if (solver->check_sat() == Solver::unsat)
+//                    frames[i + 1]->push_back((*c)[j]);
+//            }
+//            // compare frames[i] and frames[i+1]
+//        }
+//    }
 
     return false;
 }
 
-bool IC3::rec_block(Cube * cube, unsigned int) {
+bool IC3::check_proof_obligation(std::vector<Clause *> & s, unsigned int k) {
+
+    // clear memory
+    for(unsigned int i = 0 ; i < s.size() ; ++i)
+        delete s[i];
     return true;
 }
 IC3::~IC3() {

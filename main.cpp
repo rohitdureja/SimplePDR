@@ -49,7 +49,7 @@ int main() {
     IC3::IC3 * ic3_instance = new IC3::IC3(M);
 
     // Run the IC3 algorithm
-//	ic3_instance->prove();
+	ic3_instance->prove();
 
 // Clean up
     delete ic3_instance;

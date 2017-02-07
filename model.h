@@ -72,9 +72,11 @@ public:
     void add_clause(const type, const std::string);
     std::vector<Clause *> * get_trans();
     std::vector<Clause *> * get_init();
+    std::vector<Clause *> * get_prop();
     void show_trans();
     void show_init();
-    std::map<unsigned char, std::string> * get_var_map();
+    std::map<unsigned char, std::string> * get_var_map2();
+    std::map<std::string, unsigned char> * get_var_map1();
 };
 
 }

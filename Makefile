@@ -17,8 +17,9 @@ OBJ_FILE = SimplePDR.o
 all: SimplePDR
 
 SimplePDR: $(CPP_SOURCES)
-	g++ -Wall -Wextra $(Z3_HEADER_SOURCE) $(Z3_LIB_SOURCE) -std=c++11 $(CPP_SOURCES) -o $(OBJ_FILE) $(Z3_LIB)
+	g++ -Wall -Wextra -DDEBUG $(Z3_HEADER_SOURCE) $(Z3_LIB_SOURCE) -std=c++11 $(CPP_SOURCES) -o $(OBJ_FILE) $(Z3_LIB)
 	./$(OBJ_FILE)
+	
 
 clean: $(OBJ_FILE)
 	rm $(OBJ_FILE)

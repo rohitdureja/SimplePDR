@@ -57,6 +57,9 @@ std::vector<Clause*> * Model::get_trans() {
 std::vector<Clause*> * Model::get_init() {
     return &init;
 }
+std::vector<Clause*> * Model::get_prop() {
+    return &prop;
+}
 
 void Model::show_trans() {
     std::vector<int8_t> * c;
@@ -86,8 +89,12 @@ std::vector<std::string> * Model::get_variables() {
     return &str_vars;
 }
 
-std::map<unsigned char, std::string> * Model::get_var_map() {
+std::map<unsigned char, std::string> * Model::get_var_map2() {
     return &var_map2;
+}
+
+std::map<std::string, unsigned char> * Model::get_var_map1() {
+    return &var_map1;
 }
 
 } /* namespace Model */
