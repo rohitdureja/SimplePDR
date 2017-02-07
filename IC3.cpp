@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "IC3.h"
+#include <memory>
 
 namespace IC3 {
 
@@ -235,8 +236,8 @@ bool IC3::prove() {
          * in all iterations of the next for loop */
         solver->push(); // create solver stack
 
-        // get SMT2 string corresponding to frames[i]
-        SMTLIB2::generate_smtlib2_from_clause(frames[i], cnf_smt2, map2);
+        // get SMT2 string corresponding to frames[i] = cl
+        SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2);
 
 #ifdef DEBUG
         std::cout << "IC3::Frame (step = " << i << ")" << std::endl;
@@ -298,7 +299,6 @@ bool IC3::prove() {
 
             // propagate forward from frames[i] to frames[i+1]
             if(solver->check_sat() == Solver::unsat) {
-//                Clause * c = new Clause((*m)[0]);
                 frames[i+1]->push_back((*m)[0]);
             }
 
@@ -332,15 +332,17 @@ bool IC3::prove() {
 
 bool IC3::check_proof_obligation(std::vector<Clause *> & s, unsigned int k) {
 
-    Clause *c = new Clause;
+    std::auto_ptr<Clause> c(new Clause);
     c->add_literal((*map1)["a"]);
     c->add_literal((*map1)["b"]);
     frames[k]->push_back(c);
 
-    Clause *b = new Clause;
-        b->add_literal(-(*map1)["a"]);
-        b->add_literal((*map1)["b"]);
-        frames[k]->push_back(b);
+
+    std::auto_ptr<Clause> b(new Clause);
+    b->add_literal(-(*map1)["a"]);
+    b->add_literal((*map1)["b"]);
+    frames[k]->push_back(b);
+
 
     // clear memory
     for (unsigned int i = 0; i < s.size(); ++i)
@@ -350,17 +352,24 @@ bool IC3::check_proof_obligation(std::vector<Clause *> & s, unsigned int k) {
 IC3::~IC3() {
     delete solver;
 
+    std::map<unsigned long, unsigned char> chk;
     // delete frames
-    for(unsigned int i = 1 ; i < frames.size() ; ++i) {
-        std::cout << "Frame " << i << " size: " << frames[i]->size() << std::endl;
-        for(unsigned int j = 0 ; j < frames[i]->size() ; ++j) {
-            std::vector<Clause *> * c = frames[i];
-            std::cout << "Clause " << j << " size: " << c->size() << std::endl;
-            for (unsigned int k = 0 ; k < c->size() ; ++k) {
-                std::cout << (*c)[k] << std::endl;
+    for(unsigned int i = 1 ; i < frames.size() ; ++i) { // iterate over frames
+        std::vector<Clause *> * f = frames[i];
+        std::cout << "Num clauses in frame " << i << " is " << f->size() << std::endl;
+        for(unsigned int j = 0 ; j < f->size() ; ++j) { // iterative over clauses
+            Clause * c = (*f)[j];
+            std::cout << c << std::endl;
+
+            if (!chk.count((unsigned long)c)) {
+                std::cout << "deleted " << sizeof(*c) << std::endl;
+                delete c;
             }
+            chk[(unsigned long)c] == 1;
         }
+        delete f;
     }
+
 }
 
 } /* namespace IC3 */

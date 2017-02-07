@@ -41,6 +41,8 @@ public:
     Clause();
     // copy constructor
     Clause(Clause *);
+    // desttructor
+    ~Clause();
     /*
      * Member function to add a literal to a clause
      * \param t The value to write

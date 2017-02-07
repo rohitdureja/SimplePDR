@@ -32,12 +32,12 @@ void split(const std::string &s, const char* delim,
     free(dup);
 }
 
-/**
- *
- */
-
 Clause::Clause() {
 
+}
+
+Clause::~Clause() {
+    literals.clear();
 }
 
 Clause::Clause(Clause * c) {

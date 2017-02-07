@@ -55,10 +55,6 @@ void Solver::add_assertion(const std::string assertion) {
     // the C++ interface
     z3::expr formula(c, parsed1);
     s->add(formula);
-//#ifdef DEBUG
-//    std::cout << "\n---------------Z3---------------\n";
-//    std::cout << *s << "\n";
-//#endif
 }
 
 result Solver::check_sat() {

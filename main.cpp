@@ -19,10 +19,11 @@
 
 #include "model.h"
 #include "IC3.h"
+#include <memory>
 
 int main() {
     // Specify transition system
-    Model::Model *M = new Model::Model();
+    std::auto_ptr<Model::Model> M (new Model::Model());
 
     // state variables
     M->add_variable("a");
@@ -50,7 +51,7 @@ int main() {
 
 
     // Create IC3 instance
-    IC3::IC3 * ic3_instance = new IC3::IC3(M);
+    std::auto_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
 
     // Run the IC3 algorithm
 	ic3_instance->prove();
