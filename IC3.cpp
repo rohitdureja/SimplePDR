@@ -214,10 +214,8 @@ bool IC3::prove() {
            SMTLIB2::generate_clause_from_smtlib2(c, bad_cube, map1);
 
            if (!check_proof_obligation(c, k)) {
-
+               return false;
            }
-
-
        }
 
 
