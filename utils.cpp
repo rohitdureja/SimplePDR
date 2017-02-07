@@ -54,7 +54,7 @@ void generate_smtlib2_from_clause(
     smt_str_type type) {
 
     if(type == uncomp) {
-        if (clauses == NULL) {
+        if (clauses->size() == 0) {
            str_clause.push_back("(assert true)");
            return;
         }
@@ -84,7 +84,7 @@ void generate_smtlib2_from_clause(
         }
     }
     else if(type == comp) {
-        if (clauses == NULL) {
+        if (clauses->size() == 0) {
             str_clause.push_back("(assert false)");
             return;
         }
