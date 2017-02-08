@@ -25,6 +25,7 @@ int main() {
     // Specify transition system
     std::shared_ptr<Model::Model> M(new Model::Model());
 
+    /******Model 1******/
     // state variables
     M->add_variable("a");
     M->add_variable("b");
@@ -49,7 +50,35 @@ int main() {
     // safety property
     M->add_clause(Model::P, "!a||b");
 
-    // Create IC3 instance
+//    /******Model 2******/
+//    // state variables
+//    M->add_variable("a");
+//    M->add_variable("b");
+//    M->add_variable("c");
+//    M->add_variable("na");
+//    M->add_variable("nb");
+//    M->add_variable("nc");
+//
+//    // add current and next state variable relations
+//    M->add_variable_relation("a", "na");
+//    M->add_variable_relation("b", "nb");
+//    M->add_variable_relation("c", "nc");
+//
+//    // initial states
+//    M->add_clause(Model::I, "!a");
+//    M->add_clause(Model::I, "!b");
+//    M->add_clause(Model::I, "!c");
+//
+//    // transition relations
+//    M->add_clause(Model::T,  "a||!nb");
+//    M->add_clause(Model::T, "!a||nb");
+//    M->add_clause(Model::T,  "b||!nb");
+//    M->add_clause(Model::T, "!b||nb");
+
+    // safety property
+    M->add_clause(Model::P, "!a||!b||!c");
+
+// Create IC3 instance
     std::shared_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
 
     // Run the IC3 algorithm

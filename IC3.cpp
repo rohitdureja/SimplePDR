@@ -19,6 +19,7 @@
 
 #include "IC3.h"
 #include <memory>
+#include <set>
 
 namespace IC3 {
 
@@ -138,6 +139,7 @@ bool IC3::prove() {
     frames.push_back(m); // add a new frame to the trace
 
     while (true) {
+
         /*********************** blocking phase **************************
          ************************* starts here ***************************/
 
@@ -289,6 +291,7 @@ bool IC3::prove() {
         }
         cnf_smt2.clear(); // clear strings
 
+        // iterate over frames
         for (unsigned int i = 1; i < k; ++i) {
             std::vector<std::shared_ptr<Clause>> cl = frames[i];
 
@@ -371,17 +374,21 @@ bool IC3::prove() {
             /* Solver stack destroyed to remove frame[i] */
             solver->pop(); // destroy solver stack
 
-            // check if frames[i] == frames[i+1]
-            if (frames[i].size() == frames[i + 1].size()) {
-                return true;
+            std::set<std::shared_ptr<Clause>> myset1;
+            std::set<unsigned long> myset2;
+            for (unsigned int j = 0; j < frames[i].size(); ++j) {
+//                std::cout << "Frame " << i << ": " << frames[i][j] << std::endl;
+                myset1.insert(frames[i][j]);
             }
-//            for (unsigned int j = 0; j < frames[i].size(); ++j)
-//                std::cout << frames[i][j] << std::endl;
-//
-//            for (unsigned int j = 0; j < frames[i + 1].size(); ++j)
-//                std::cout << frames[i + 1][j] << std::endl;
 
-//        }
+            for (unsigned int j = 0; j < frames[i + 1].size(); ++j) {
+//                std::cout <<  "Frame " << i+1 << ": " << frames[i + 1][j] << std::endl;
+                myset1.erase(frames[i+1][j]);
+            }
+//            std::cout << myset1.size() << std::endl;
+            if(myset1.size() == 0)
+                return true;
+
         }
         /* Solver stack destroyed to remove trans */
         solver->pop(); // destroy solver stack
@@ -600,7 +607,7 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 }
 
 IC3::~IC3() {
-    delete solver;
+//    delete solver;
 }
 
 } /* namespace IC3 */

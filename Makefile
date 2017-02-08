@@ -21,7 +21,7 @@ all: SimplePDR
 
 SimplePDR: $(CPP_SOURCES)
 	g++ -Wall -Wextra $(DEBUG) $(Z3_HEADER_SOURCE) $(Z3_LIB_SOURCE) -std=c++11 $(CPP_SOURCES) -o $(OBJ_FILE) $(Z3_LIB)
-	./$(OBJ_FILE)
+#	./$(OBJ_FILE)
 	
 
 clean: $(OBJ_FILE)
