@@ -54,7 +54,11 @@ int main() {
     std::shared_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
 
     // Run the IC3 algorithm
-	ic3_instance->prove();
+	bool res = ic3_instance->prove();
+	if (res == true)
+	    std::cout << "SAT";
+	else
+	    std::cout << "UNSAT";
 
 // Clean up
 

@@ -37,7 +37,6 @@ Clause::Clause() {
 }
 
 Clause::~Clause() {
-    std::cout << "sajhasgasjfgajsfgahsgfas" << std::endl;
     literals.clear();
 }
 
@@ -62,7 +61,7 @@ namespace SMTLIB2 {
 /* Utility to generate SMTLIB2 strings for each clause in the
  * passed vector
  */
-void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
+void generate_smtlib2_from_clause(const std::vector<std::shared_ptr<Clause>> clauses,
         std::vector<std::string> &str_clause,
         std::map<unsigned char, std::string> * map, smt_str_type type,
         std::map<std::string, std::string> * nmap) {
@@ -286,12 +285,8 @@ std::shared_ptr<Clause> cube_to_clause(std::vector<std::shared_ptr<Clause>> cube
     std::shared_ptr<Clause> clause(new Clause());
     for(unsigned int i = 0 ; i < cube.size() ; ++i) {
         std::vector<signed char> lit = cube[i]->get_literals();
-        for(unsigned int j = 0 ; j < lit.size() ; ++j) {
-            if(lit[j] > 0)
-                clause->add_literal(-lit[j]);
-            else
-                clause->add_literal(lit[j]);
-        }
+        for(unsigned int j = 0 ; j < lit.size() ; ++j)
+            clause->add_literal(-lit[j]);
     }
     return clause;
 }

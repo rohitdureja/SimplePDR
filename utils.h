@@ -64,7 +64,7 @@ enum smt_str_type {
 };
 // generate SMT string from a passed pointer vector of clause pointers
 void generate_smtlib2_from_clause(
-        std::vector<std::shared_ptr<Clause>>,
+        const std::vector<std::shared_ptr<Clause>>,
         std::vector<std::string> &,
         std::map<unsigned char, std::string> *,
         smt_str_type type,
