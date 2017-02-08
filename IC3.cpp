@@ -366,7 +366,7 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
     // get SMT2 string corresponding to frames[k-1]
     SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2, SMTLIB2::uncomp,
-            NULL);
+    NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Frame (step = " << k-1 << ")" << std::endl;
@@ -385,7 +385,7 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
     // get SMT2 string corresponding to (not s)
     SMTLIB2::generate_smtlib2_from_clause(s, cnf_smt2, map2, SMTLIB2::comp,
-            NULL);
+    NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::bad cube (not s)" << std::endl;
@@ -421,19 +421,112 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
     }
     cnf_smt2.clear(); // clear strings
 
+    // TODO: convert this if to while
+    while (solver->check_sat() == Solver::sat) {
 
+        // get model corresponding to bad cube t
+        std::vector<std::string> bad_cube = solver->get_model();
+#ifdef DEBUG
+        std::cout << "IC3::Bad cube found!\n";
+        for(unsigned int i = 0; i < bad_cube.size(); ++i)
+        std::cout << "IC3::" << bad_cube[i] << std::endl;
+#endif
+        solver->pop(); // destroy solver stack
 
-//    std::shared_ptr<Clause> c(new Clause);
-//    c->add_literal((*map1)["a"]);
-//    c->add_literal((*map1)["b"]);
-//    frames[k].push_back(c);
-//
-//
-//    std::shared_ptr<Clause> b(new Clause);
-//    b->add_literal(-(*map1)["a"]);
-//    b->add_literal((*map1)["b"]);
-//    frames[k].push_back(b);
+        // convert bad cube to multiple clauses
+        std::vector<std::shared_ptr<Clause>> t;
+        SMTLIB2::generate_clause_from_smtlib2(t, bad_cube, map1);
 
+        if (!check_proof_obligation(t, k - 1)) {
+            return false;
+        }
+
+        solver->push();
+
+        // get SMT2 string corresponding to trans
+        SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2,
+                SMTLIB2::uncomp, NULL);
+
+#ifdef DEBUG
+        std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
+        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+        // iterate over the SMT2 strings for each clause
+        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+            solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        }
+        cnf_smt2.clear(); // clear strings
+
+        std::vector<std::shared_ptr<Clause>> cl = frames[k - 1];
+
+        // get SMT2 string corresponding to frames[k-1]
+        SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2,
+                SMTLIB2::uncomp,
+                NULL);
+
+#ifdef DEBUG
+        std::cout << "IC3::Frame (step = " << k-1 << ")" << std::endl;
+        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+        // iterate over the SMT2 strings for each clause
+        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+            solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        }
+        cnf_smt2.clear(); // clear strings
+
+        // get SMT2 string corresponding to (not s)
+        SMTLIB2::generate_smtlib2_from_clause(s, cnf_smt2, map2, SMTLIB2::comp,
+        NULL);
+
+#ifdef DEBUG
+        std::cout << "IC3::bad cube (not s)" << std::endl;
+        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+        // iterate over the SMT2 strings for each clause
+        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+            solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        }
+        cnf_smt2.clear(); // clear strings
+
+        // get SMT2 string corresponding to (s')
+        SMTLIB2::generate_smtlib2_from_clause(s, cnf_smt2, map2,
+                SMTLIB2::uncomp, nmap);
+
+#ifdef DEBUG
+        std::cout << "IC3::bad cube s'" << std::endl;
+        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+#endif
+
+        // iterate over the SMT2 strings for each clause
+        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+#ifdef DEBUG
+            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+#endif
+            solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        }
+        cnf_smt2.clear(); // clear strings
+
+    }
+    std::shared_ptr<Clause> b(SMTLIB2::cube_to_clause(s));
+    for(unsigned int i = 1; i <= k ; ++i) {
+        frames[i].push_back(b);
+    }
     return true;
 }
 

@@ -75,6 +75,8 @@ void generate_clause_from_smtlib2(
         std::vector<std::shared_ptr<Clause>> &,
         std::vector<std::string>,
         std::map<std::string, unsigned char> *);
+
+std::shared_ptr<Clause> cube_to_clause(std::vector<std::shared_ptr<Clause>>);
 }
 
 typedef Clause Cube;

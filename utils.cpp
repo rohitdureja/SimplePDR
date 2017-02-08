@@ -112,8 +112,10 @@ void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
                     str_clause[0] =
                             literals[0] > 0 ?
                                     str_clause[0] + " (not "
-                                            + (*nmap)[(*map)[literals[0]]] + ")" :
-                                    str_clause[0] + " " + (*nmap)[(*map)[-literals[0]]];
+                                            + (*nmap)[(*map)[literals[0]]]
+                                            + ")" :
+                                    str_clause[0] + " "
+                                            + (*nmap)[(*map)[-literals[0]]];
 
                     str_clause[0] = str_clause[0] + ")";
                 } else {
@@ -123,15 +125,15 @@ void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
                         str_clause[0] =
                                 literals[j] > 0 ?
                                         str_clause[0] + " (not "
-                                                + (*nmap)[(*map)[literals[j]]] + ")" :
+                                                + (*nmap)[(*map)[literals[j]]]
+                                                + ")" :
                                         str_clause[0] + " "
                                                 + (*nmap)[(*map)[-literals[j]]];
 
                     }
                     str_clause[0] = str_clause[0] + "))";
                 }
-            }
-            else {
+            } else {
                 str_clause.push_back("(assert (or");
                 // iterate over all clauses
                 for (unsigned int i = 0; i < clauses.size(); ++i) {
@@ -141,10 +143,10 @@ void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
                         str_clause[0] =
                                 literals[0] > 0 ?
                                         str_clause[0] + " (not "
-                                                + (*nmap)[(*map)[literals[0]]] + ")" :
+                                                + (*nmap)[(*map)[literals[0]]]
+                                                + ")" :
                                         str_clause[0] + " "
                                                 + (*nmap)[(*map)[-literals[0]]];
-
 
                     } else {
                         str_clause[0] = str_clause[0] + " (and";
@@ -226,8 +228,7 @@ void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
                     }
                     str_clause[0] = str_clause[0] + "))";
                 }
-            }
-            else {
+            } else {
                 str_clause.push_back("(assert (or");
                 // iterate over all clauses
                 for (unsigned int i = 0; i < clauses.size(); ++i) {
@@ -240,7 +241,6 @@ void generate_smtlib2_from_clause(std::vector<std::shared_ptr<Clause>> clauses,
                                                 + (*map)[literals[0]] + ")" :
                                         str_clause[0] + " "
                                                 + (*map)[-literals[0]];
-
 
                     } else {
                         str_clause[0] = str_clause[0] + " (and";
@@ -281,9 +281,20 @@ void generate_clause_from_smtlib2(
     }
 }
 
-//void generate_clause_from_smtlib2() {
-//    std::cout << "hello";
-//}
+std::shared_ptr<Clause> cube_to_clause(std::vector<std::shared_ptr<Clause>> cube) {
+    std::shared_ptr<Clause> clause(new Clause());
+    for(unsigned int i = 0 ; i < cube.size() ; ++i) {
+        std::vector<signed char> lit = cube[i]->get_literals();
+        for(unsigned int j = 0 ; j < lit.size() ; ++j) {
+            if(lit[j] > 0)
+                clause->add_literal(-lit[j]);
+            else
+                clause->add_literal(lit[j]);
+        }
+    }
+    return clause;
+}
+
 
 } /* namespace SMTLIB2 */
 
