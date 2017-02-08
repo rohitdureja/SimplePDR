@@ -46,32 +46,33 @@ IC3::IC3(std::shared_ptr<Model::Model> M) {
 
 }
 
-/*
- * IC3 ``main'' algorithm description is described in:
- * Griggio, Alberto, and Marco Roveri. "Comparing different variants of the
- * IC3 algorithm for hardware model checking." IEEE Transactions on
- * Computer-Aided Design of Integrated Circuits and Systems 35.6 (2016).
- *
- * 	bool IC3(I,T,P):
- * 		if is_sat(I & !P): return False;
- * 		F[0] = I # first element of trace is init formula
- * 		k = 1, F[k] = T # add a new frame to the trace
- * 		while True:
- * 			# blocking phase
- * 			while is_sat(F[k] & P):
- * 				c = get_model() # extract bad cube c
- * 				if not rec_block(c,k):
- * 					return False # counterexample found
- *
- * 			# propagation phase
- * 			k = k + 1, F[k] = T
- * 			for i = 1 to k - 1:
- * 				for each clause c \in F[i]:
- * 					if not is_sat(F[i] & c & T & !c'):
- * 						add c to F[i+1]
- * 				if F[i] == F[i+1]: return True
- *
- */
+/************************************************************************
+ * IC3 ``main'' algorithm description is described in:                  *
+ * Griggio, Alberto, and Marco Roveri. "Comparing different variants    *
+ * of the IC3 algorithm for hardware model checking." IEEE              *
+ * Transactions on Computer-Aided Design of Integrated Circuits and     *
+ * Systems 35.6 (2016).                                                 *
+ *                                                                      *
+ * 	bool IC3(I,T,P):                                                    *
+ * 		if is_sat(I & !P): return False;                                *
+ * 		F[0] = I # first element of trace is init formula               *
+ * 		k = 1, F[k] = T # add a new frame to the trace                  *
+ * 		while True:                                                     *
+ * 			# blocking phase                                            *
+ * 			while is_sat(F[k] & P):                                     *
+ * 				c = get_model() # extract bad cube c                    *
+ * 				if not rec_block(c,k):                                  *
+ * 					return False # counterexample found                 *
+ *                                                                      *
+ * 			# propagation phase                                         *
+ * 			k = k + 1, F[k] = T                                         *
+ * 			for i = 1 to k - 1:                                         *
+ * 				for each clause c \in F[i]:                             *
+ * 					if not is_sat(F[i] & c & T & !c'):                  *
+ * 						add c to F[i+1]                                 *
+ * 				if F[i] == F[i+1]: return True                          *
+ *                                                                      *
+ ************************************************************************/
 
 bool IC3::prove() {
     // helper string vector to hold SMTLIB2 formulas
@@ -137,7 +138,7 @@ bool IC3::prove() {
     frames.push_back(m); // add a new frame to the trace
 
     //TODO: uncomment this while
-//    while (false) {
+    while (false) {
 
     /*********************** blocking phase **************************
      ************************* starts here ***************************/
@@ -330,6 +331,10 @@ bool IC3::prove() {
     }
     /* Solver stack destroyed to remove trans */
     solver->pop(); // destroy solver stack
+
+    /********************** propagation phase ************************
+     ************************** ends here ****************************/
+    }
     return true;
 }
 
@@ -421,7 +426,6 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
     }
     cnf_smt2.clear(); // clear strings
 
-    // TODO: convert this if to while
     while (solver->check_sat() == Solver::sat) {
 
         // get model corresponding to bad cube t
@@ -524,7 +528,7 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
     }
     std::shared_ptr<Clause> b(SMTLIB2::cube_to_clause(s));
-    for(unsigned int i = 1; i <= k ; ++i) {
+    for (unsigned int i = 1; i <= k; ++i) {
         frames[i].push_back(b);
     }
     return true;

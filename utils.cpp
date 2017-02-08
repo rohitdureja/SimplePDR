@@ -37,6 +37,7 @@ Clause::Clause() {
 }
 
 Clause::~Clause() {
+    std::cout << "sajhasgasjfgajsfgahsgfas" << std::endl;
     literals.clear();
 }
 
