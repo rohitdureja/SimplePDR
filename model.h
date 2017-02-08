@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <map>
 #include "utils.h"
+#include <memory>
 
 namespace Model {
 
@@ -43,9 +44,9 @@ class Model {
      * Vector containing pointer to clauses clauses for the
      * transition system.
      */
-    std::vector<Clause*> trans;
-    std::vector<Clause*> init;
-    std::vector<Clause*> prop;
+    std::vector<std::shared_ptr<Clause>> trans;
+    std::vector<std::shared_ptr<Clause>> init;
+    std::vector<std::shared_ptr<Clause>> prop;
 
     // Helpers objects
     std::map<std::string, unsigned char> var_map1; //	name -> int
@@ -59,24 +60,24 @@ public:
     Model() {
         vcount = 1;
     }
-    ~Model() {
-        for (unsigned char i = 0; i < trans.size(); ++i)
-            delete trans[i];
-        for (unsigned char i = 0; i < init.size(); ++i)
-            delete init[i];
-        for (unsigned char i = 0; i < prop.size(); ++i)
-            delete prop[i];
-    }
+//    ~Model() {
+//        for (unsigned char i = 0; i < trans.size(); ++i)
+//            delete trans[i];
+//        for (unsigned char i = 0; i < init.size(); ++i)
+//            delete init[i];
+//        for (unsigned char i = 0; i < prop.size(); ++i)
+//            delete prop[i];
+//    }
 
-    std::vector<std::string> * get_variables();
+    std::vector<std::string> get_variables();
     void add_variable(const std::string);
     void add_variable_relation(const std::string,
                                       const std::string);
 
     void add_clause(const type, const std::string);
-    std::vector<Clause *> * get_trans();
-    std::vector<Clause *> * get_init();
-    std::vector<Clause *> * get_prop();
+    std::vector<std::shared_ptr<Clause>> get_trans();
+    std::vector<std::shared_ptr<Clause>> get_init();
+    std::vector<std::shared_ptr<Clause>> get_prop();
     void show_trans();
     void show_init();
     std::map<unsigned char, std::string> * get_var_map2();

@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 void split(const std::string &s, const char* delim,
         std::vector<std::string> & v);
@@ -53,7 +54,7 @@ public:
      * literals in the clause.
      * \return a pointer to the literals vectors
      */
-    std::vector<signed char> * get_literals();
+    std::vector<signed char> get_literals();
 };
 
 namespace SMTLIB2 {
@@ -63,15 +64,15 @@ enum smt_str_type {
 };
 // generate SMT string from a passed pointer vector of clause pointers
 void generate_smtlib2_from_clause(
-        std::vector<Clause *> *,
+        std::vector<std::shared_ptr<Clause>>,
         std::vector<std::string> &,
         std::map<unsigned char, std::string> *,
-        smt_str_type type = uncomp,
-        std::map<std::string, std::string> * nmap = NULL);
+        smt_str_type type,
+        std::map<std::string, std::string> * nmap);
 
 // generate vector of clause pointers from SMT string
 void generate_clause_from_smtlib2(
-        std::vector<Clause *> & ,
+        std::vector<std::shared_ptr<Clause>> &,
         std::vector<std::string>,
         std::map<std::string, unsigned char> *);
 }

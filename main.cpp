@@ -23,7 +23,7 @@
 
 int main() {
     // Specify transition system
-    std::auto_ptr<Model::Model> M (new Model::Model());
+    std::shared_ptr<Model::Model> M(new Model::Model());
 
     // state variables
     M->add_variable("a");
@@ -51,14 +51,12 @@ int main() {
 
 
     // Create IC3 instance
-    std::auto_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
+    std::shared_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
 
     // Run the IC3 algorithm
 	ic3_instance->prove();
 
 // Clean up
-    delete ic3_instance;
-    delete M;
 
     return 0;
 }

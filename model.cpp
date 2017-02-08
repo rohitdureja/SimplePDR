@@ -35,7 +35,7 @@ void Model::add_variable_relation(const std::string curr, const std::string next
 
 void Model::add_clause(const type ctype,
                        const std::string clause) {
-    Clause *c = new Clause();
+    std::shared_ptr<Clause> c(new Clause());
     std::vector<std::string> parse;
     split(clause, "||", parse);
     for (unsigned char i = 0; i < parse.size(); ++i) {
@@ -55,42 +55,42 @@ void Model::add_clause(const type ctype,
         std::cout << "Undefined type!" << std::endl;
 }
 
-std::vector<Clause*> * Model::get_trans() {
-    return &trans;
+std::vector<std::shared_ptr<Clause>> Model::get_trans() {
+    return trans;
 }
-std::vector<Clause*> * Model::get_init() {
-    return &init;
+std::vector<std::shared_ptr<Clause>> Model::get_init() {
+    return init;
 }
-std::vector<Clause*> * Model::get_prop() {
-    return &prop;
+std::vector<std::shared_ptr<Clause>> Model::get_prop() {
+    return prop;
 }
 
 void Model::show_trans() {
-    std::vector<int8_t> * c;
+    std::vector<signed char> c;
     for (unsigned char i = 0; i < trans.size(); ++i) {
         c = trans[i]->get_literals();
-        for (unsigned char j = 0; j < c->size(); ++j)
-            std::cout << ((*c)[j] > 0 ?
-                         var_map2[(*c)[j]] :
-                         "!" + var_map2[-(*c)[j]]) + " ";
+        for (unsigned char j = 0; j < c.size(); ++j)
+            std::cout << (c[j] > 0 ?
+                         var_map2[c[j]] :
+                         "!" + var_map2[-c[j]]) + " ";
         std::cout << std::endl;
     }
 }
 
 void Model::show_init() {
-    std::vector<signed char> * c;
+    std::vector<signed char> c;
     for (unsigned char i = 0; i < init.size(); ++i) {
         c = init[i]->get_literals();
-        for (unsigned char j = 0; j < c->size(); ++j)
-            std::cout << ((*c)[j] > 0 ?
-                         var_map2[(*c)[j]] :
-                         "!" + var_map2[-(*c)[j]]) + " ";
+        for (unsigned char j = 0; j < c.size(); ++j)
+            std::cout << (c[j] > 0 ?
+                         var_map2[c[j]] :
+                         "!" + var_map2[-c[j]]) + " ";
         std::cout << std::endl;
     }
 }
 
-std::vector<std::string> * Model::get_variables() {
-    return &str_vars;
+std::vector<std::string> Model::get_variables() {
+    return str_vars;
 }
 
 std::map<unsigned char, std::string> * Model::get_var_map2() {

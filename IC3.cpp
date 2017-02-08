@@ -22,7 +22,7 @@
 
 namespace IC3 {
 
-IC3::IC3(Model::Model *M) {
+IC3::IC3(std::shared_ptr<Model::Model> M) {
 //	M->show_init();
 //    M->show_trans();
     solver = new Solver::Solver();
@@ -31,8 +31,8 @@ IC3::IC3(Model::Model *M) {
     map2 = M->get_var_map2();
     nmap = M->get_var_rel_map();
 
-    for (unsigned int i = 0; i < (*M->get_variables()).size(); ++i) {
-        solver->add_symbol((*M->get_variables())[i], Solver::Boolean);
+    for (unsigned int i = 0; i < (M->get_variables()).size(); ++i) {
+        solver->add_symbol((M->get_variables())[i], Solver::Boolean);
     }
 
     // get pointer to initial states
@@ -83,7 +83,7 @@ bool IC3::prove() {
     solver->push(); // create solver stack
 
     // get SMT2 string corresponding to init
-    SMTLIB2::generate_smtlib2_from_clause(init, cnf_smt2, map2);
+    SMTLIB2::generate_smtlib2_from_clause(init, cnf_smt2, map2, SMTLIB2::uncomp, NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Initial State (size = " << cnf_smt2.size()
@@ -101,7 +101,7 @@ bool IC3::prove() {
     cnf_smt2.clear(); // clear strings
 
     // get SMT2 string corresponding to (not prop)
-    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp);
+    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp, NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
@@ -131,7 +131,8 @@ bool IC3::prove() {
     frames.push_back(init);
 
     unsigned int k = 1; // active frame number
-    frames.push_back(new std::vector<Clause *>); // add a new frame to the trace
+    std::vector<std::shared_ptr<Clause>> m;
+    frames.push_back(m); // add a new frame to the trace
 
     //TODO: uncomment this while
 //    while (false) {
@@ -141,7 +142,7 @@ bool IC3::prove() {
     solver->push(); // create solver stack
 
     // get SMT2 string corresponding to frames[k]
-    SMTLIB2::generate_smtlib2_from_clause(frames[k], cnf_smt2, map2);
+    SMTLIB2::generate_smtlib2_from_clause(frames[k], cnf_smt2, map2, SMTLIB2::uncomp, NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Frame (step = " << k << ")" << std::endl;
@@ -159,7 +160,7 @@ bool IC3::prove() {
     cnf_smt2.clear(); // clear strings
 
     // get SMT2 string corresponding to (not prop)
-    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp);
+    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp, NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
@@ -190,7 +191,7 @@ bool IC3::prove() {
         solver->pop(); // destroy solver stack
 
         // convert bad cube to multiple clauses
-        std::vector<Clause *> c;
+        std::vector<std::shared_ptr<Clause>> c;
         SMTLIB2::generate_clause_from_smtlib2(c, bad_cube, map1);
 
         if (!check_proof_obligation(c, k)) {
@@ -205,14 +206,15 @@ bool IC3::prove() {
      ************************* starts here ***************************/
 
     k = k + 1;
-    frames.push_back(new std::vector<Clause *>); // add a new frame to the trace
+    std::vector<std::shared_ptr<Clause>> n;
+    frames.push_back(n); // add a new frame to the trace
 
     /* New solver stack created since trans is always present
      * in subsequent calls to Z3 (next for loop) */
     solver->push(); // create solver stack
 
     // get SMT2 string corresponding to trans
-    SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2);
+    SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2, SMTLIB2::uncomp, NULL);
 
 #ifdef DEBUG
     std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
@@ -230,14 +232,14 @@ bool IC3::prove() {
     cnf_smt2.clear(); // clear strings
 
     for (unsigned int i = 1; i < k; ++i) {
-        std::vector<Clause *> * cl = frames[i];
+        std::vector<std::shared_ptr<Clause>> cl = frames[i];
 
         /* New solver stack created since frames[i] is present
          * in all iterations of the next for loop */
         solver->push(); // create solver stack
 
         // get SMT2 string corresponding to frames[i] = cl
-        SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2);
+        SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2, SMTLIB2::uncomp, NULL);
 
 #ifdef DEBUG
         std::cout << "IC3::Frame (step = " << i << ")" << std::endl;
@@ -255,14 +257,14 @@ bool IC3::prove() {
         cnf_smt2.clear(); // clear strings
 
         // Iterate over all clauses in frames[i];
-        for (unsigned j = 0; j < cl->size(); ++j) {
+        for (unsigned j = 0; j < cl.size(); ++j) {
             /* New solver stack created for adding cl[i] to solver */
             solver->push(); // create solver stack
 
             // get SMT2 string corresponding to cl[j]
-            std::vector<Clause *> * m = new std::vector<Clause *>;
-            m->push_back((*cl)[j]);
-            SMTLIB2::generate_smtlib2_from_clause(m, cnf_smt2, map2);
+            std::vector<std::shared_ptr<Clause>> m; // = new std::vector<Clause *>;
+            m.push_back(cl[j]);
+            SMTLIB2::generate_smtlib2_from_clause(m, cnf_smt2, map2, SMTLIB2::uncomp, NULL);
 
 #ifdef DEBUG
             std::cout << "IC3::clause[" << j << "] in frames[" << i << "]" << std::endl;
@@ -299,12 +301,14 @@ bool IC3::prove() {
 
             // propagate forward from frames[i] to frames[i+1]
             if(solver->check_sat() == Solver::unsat) {
-                frames[i+1]->push_back((*m)[0]);
+                frames[i+1].push_back(m[0]);
             }
 
             /* Solver stack destroyed to remove cl[i] */
             solver->pop(); // destroy solver stack
         }
+
+
 
         /* Solver stack destroyed to remove frame[i] */
         solver->pop(); // destroy solver stack
@@ -313,62 +317,42 @@ bool IC3::prove() {
     /* Solver stack destroyed to remove trans */
     solver->pop(); // destroy solver stack
 
-//
-//        for (unsigned int i = 1; i < k; ++i) {
-//            std::vector<Clause *> * c = frames[i];
-//            for (unsigned int j = 0; j < c->size(); ++j) {
-//                solver->push(1);
-//                solver->add_assertion(
-//                        "(assert (and frame[i] c[j] trans (not c[j]')))");
-//                if (solver->check_sat() == Solver::unsat)
-//                    frames[i + 1]->push_back((*c)[j]);
-//            }
-//            // compare frames[i] and frames[i+1]
-//        }
-//    }
+////
+////        for (unsigned int i = 1; i < k; ++i) {
+////            std::vector<Clause *> * c = frames[i];
+////            for (unsigned int j = 0; j < c->size(); ++j) {
+////                solver->push(1);
+////                solver->add_assertion(
+////                        "(assert (and frame[i] c[j] trans (not c[j]')))");
+////                if (solver->check_sat() == Solver::unsat)
+////                    frames[i + 1]->push_back((*c)[j]);
+////            }
+////            // compare frames[i] and frames[i+1]
+////        }
+////    }
 
     return false;
 }
 
-bool IC3::check_proof_obligation(std::vector<Clause *> & s, unsigned int k) {
+bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s, unsigned int k) {
 
-    std::auto_ptr<Clause> c(new Clause);
+    std::shared_ptr<Clause> c(new Clause);
     c->add_literal((*map1)["a"]);
     c->add_literal((*map1)["b"]);
-    frames[k]->push_back(c);
+    frames[k].push_back(c);
 
 
-    std::auto_ptr<Clause> b(new Clause);
+    std::shared_ptr<Clause> b(new Clause);
     b->add_literal(-(*map1)["a"]);
     b->add_literal((*map1)["b"]);
-    frames[k]->push_back(b);
+    frames[k].push_back(b);
 
 
-    // clear memory
-    for (unsigned int i = 0; i < s.size(); ++i)
-        delete s[i];
     return true;
 }
+
 IC3::~IC3() {
     delete solver;
-
-    std::map<unsigned long, unsigned char> chk;
-    // delete frames
-    for(unsigned int i = 1 ; i < frames.size() ; ++i) { // iterate over frames
-        std::vector<Clause *> * f = frames[i];
-        std::cout << "Num clauses in frame " << i << " is " << f->size() << std::endl;
-        for(unsigned int j = 0 ; j < f->size() ; ++j) { // iterative over clauses
-            Clause * c = (*f)[j];
-            std::cout << c << std::endl;
-
-            if (!chk.count((unsigned long)c)) {
-                std::cout << "deleted " << sizeof(*c) << std::endl;
-                delete c;
-            }
-            chk[(unsigned long)c] == 1;
-        }
-        delete f;
-    }
 
 }
 

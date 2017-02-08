@@ -24,6 +24,7 @@
 #include "solver.h"
 #include <vector>
 #include "utils.h"
+#include <memory>
 
 namespace IC3 {
 
@@ -58,17 +59,18 @@ private:
      * 	std::cout << (*lit)[i] << std::endl;
      * }
      */
-    std::vector<std::vector<Clause *> *> frames;
-    std::vector<Clause *> * init;
-    std::vector<Clause *> * trans;
-    std::vector<Clause *> * prop;
+    std::vector<std::vector<std::shared_ptr<Clause>>> frames;
+    std::vector<std::shared_ptr<Clause>> init;
+    std::vector<std::shared_ptr<Clause>> trans;
+    std::vector<std::shared_ptr<Clause>> prop;
     std::map<std::string, unsigned char> * map1;
     std::map<unsigned char, std::string> * map2;
     std::map<std::string, std::string> * nmap;
 
-    bool check_proof_obligation(std::vector<Clause *> &, unsigned int);
+    bool check_proof_obligation(std::vector<std::shared_ptr<Clause>>, unsigned int);
+
 public:
-    IC3(Model::Model *);
+    IC3(std::shared_ptr<Model::Model>);
     bool prove();
     virtual ~IC3();
 };
