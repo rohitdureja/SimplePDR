@@ -59,7 +59,7 @@ private:
      * 	std::cout << (*lit)[i] << std::endl;
      * }
      */
-    std::vector<std::vector<std::shared_ptr<Clause>>> frames;
+    std::vector<std::vector<std::shared_ptr<Clause>>>frames;
     std::vector<std::shared_ptr<Clause>> init;
     std::vector<std::shared_ptr<Clause>> trans;
     std::vector<std::shared_ptr<Clause>> prop;
@@ -75,6 +75,7 @@ public:
     virtual ~IC3();
 };
 
-} /* namespace IC3 */
+}
+/* namespace IC3 */
 
 #endif /* IC3_H_ */

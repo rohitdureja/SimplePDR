@@ -59,22 +59,17 @@ public:
 
 namespace SMTLIB2 {
 enum smt_str_type {
-    comp,
-    uncomp
+    comp, uncomp
 };
 // generate SMT string from a passed pointer vector of clause pointers
-void generate_smtlib2_from_clause(
-        const std::vector<std::shared_ptr<Clause>>,
-        std::vector<std::string> &,
-        std::map<unsigned char, std::string> *,
-        smt_str_type type,
-        std::map<std::string, std::string> * nmap);
+void generate_smtlib2_from_clause(const std::vector<std::shared_ptr<Clause>>,
+        std::vector<std::string> &, std::map<unsigned char, std::string> *,
+        smt_str_type type, std::map<std::string, std::string> * nmap);
 
 // generate vector of clause pointers from SMT string
-void generate_clause_from_smtlib2(
-        std::vector<std::shared_ptr<Clause>> &,
-        std::vector<std::string>,
-        std::map<std::string, unsigned char> *);
+void generate_clause_from_smtlib2(std::vector<std::shared_ptr<Clause>> &,
+        std::vector<std::string>, std::map<std::string, unsigned char> *,
+        unsigned int);
 
 std::shared_ptr<Clause> cube_to_clause(std::vector<std::shared_ptr<Clause>>);
 }

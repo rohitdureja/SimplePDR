@@ -71,8 +71,7 @@ public:
 
     std::vector<std::string> get_variables();
     void add_variable(const std::string);
-    void add_variable_relation(const std::string,
-                                      const std::string);
+    void add_variable_relation(const std::string, const std::string);
 
     void add_clause(const type, const std::string);
     std::vector<std::shared_ptr<Clause>> get_trans();

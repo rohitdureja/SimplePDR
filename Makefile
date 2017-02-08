@@ -14,10 +14,13 @@ CPP_SOURCES = \
 # Output object file
 OBJ_FILE = SimplePDR.o
 
+# Definitions
+DEBUG = -DDEBUG
+
 all: SimplePDR
 
 SimplePDR: $(CPP_SOURCES)
-	g++ -Wall -Wextra -DDEBUG $(Z3_HEADER_SOURCE) $(Z3_LIB_SOURCE) -std=c++11 $(CPP_SOURCES) -o $(OBJ_FILE) $(Z3_LIB)
+	g++ -Wall -Wextra $(DEBUG) $(Z3_HEADER_SOURCE) $(Z3_LIB_SOURCE) -std=c++11 $(CPP_SOURCES) -o $(OBJ_FILE) $(Z3_LIB)
 	./$(OBJ_FILE)
 	
 

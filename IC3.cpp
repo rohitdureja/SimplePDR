@@ -137,9 +137,7 @@ bool IC3::prove() {
     std::vector<std::shared_ptr<Clause>> m;
     frames.push_back(m); // add a new frame to the trace
 
-    int abc = 0;
-    while (abc < 5) {
-        abc++;
+    while (true) {
         /*********************** blocking phase **************************
          ************************* starts here ***************************/
 
@@ -203,7 +201,7 @@ bool IC3::prove() {
 
             // convert bad cube to multiple clauses
             std::vector<std::shared_ptr<Clause>> c;
-            SMTLIB2::generate_clause_from_smtlib2(c, bad_cube, map1);
+            SMTLIB2::generate_clause_from_smtlib2(c, bad_cube, map1, nmap->size());
 
             if (!check_proof_obligation(c, k)) {
                 return false;
@@ -374,7 +372,7 @@ bool IC3::prove() {
             solver->pop(); // destroy solver stack
 
             // check if frames[i] == frames[i+1]
-            if(frames[i].size() == frames[i+1].size()) {
+            if (frames[i].size() == frames[i + 1].size()) {
                 return true;
             }
 //            for (unsigned int j = 0; j < frames[i].size(); ++j)
@@ -398,8 +396,8 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
         unsigned int k) {
 
 #ifdef DEBUG
-        std::cout << "\n-------Check proof obligation-------" << std::endl;
-        std::cout << "------------------------------------\n" << std::endl;
+    std::cout << "\n-------Check proof obligation-------" << std::endl;
+    std::cout << "------------------------------------\n" << std::endl;
 #endif
 
     if (k == 0)
@@ -500,9 +498,9 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
         solver->pop(); // destroy solver stack
 
-        // convert bad cube to multiple clauses
+        // convert bad cube to multiple clauses (containing curr states only)
         std::vector<std::shared_ptr<Clause>> t;
-        SMTLIB2::generate_clause_from_smtlib2(t, bad_cube, map1);
+        SMTLIB2::generate_clause_from_smtlib2(t, bad_cube, map1, nmap->size());
 
         if (!check_proof_obligation(t, k - 1)) {
             return false;
@@ -593,80 +591,10 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
     solver->pop();
 
-//    for(unsigned int i = 0 ; i<s.size() ; ++i) {
-//        std::shared_ptr<Clause> tmp = s[i];
-//        std::vector<signed char> ltemp = tmp->get_literals();
-//
-//            for(unsigned int i = 0 ; i < ltemp.size() ; ++i)
-//                std::cout << (signed int)ltemp[i] << std::endl;
-//    }
-//    // get SMT2 string corresponding to (s)
-//            SMTLIB2::generate_smtlib2_from_clause(s, cnf_smt2, map2, SMTLIB2::uncomp,
-//            NULL);
-//
-//    #ifdef DEBUG
-//            std::cout << "IC3::bad cube (s)" << std::endl;
-//            for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-//            std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-//    #endif
-//
-//            cnf_smt2.clear();
-//
-//            for(unsigned int i = 0 ; i<s.size() ; ++i) {
-//                   std::shared_ptr<Clause> tmp = s[i];
-//                   std::vector<signed char> ltemp = tmp->get_literals();
-//                       for(unsigned int i = 0 ; i < ltemp.size() ; ++i)
-//                           std::cout << (signed int)ltemp[i] << std::endl;
-//               }
-//
-//
-//            std::cout << "her" << std::endl;
-
     std::shared_ptr<Clause> b(SMTLIB2::cube_to_clause(s));
-//    std::vector<signed char> ltemp = b->get_literals();
-//    std::cout << ltemp.size() << std::endl;
-//    for(unsigned int i = 0 ; i < ltemp.size() ; ++i)
-//        std::cout << (int)ltemp[i] << std::endl;
-//    std::vector<std::shared_ptr<Clause>> tmp ;
-//    tmp.push_back(b);
-//    // get SMT2 string corresponding to b
-//                SMTLIB2::generate_smtlib2_from_clause(tmp, cnf_smt2, map2, SMTLIB2::uncomp,
-//                NULL);
-//
-//        #ifdef DEBUG
-//                std::cout << "IC3::generalization (b)" << std::endl;
-//                for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-//                std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-//        #endif
-//                cnf_smt2.clear();
 
     for (unsigned int i = 1; i <= k; ++i) {
-//        std::cout << frames[i].size() << std::endl;
-//        // get SMT2 string corresponding to frames[k-1]
-//                SMTLIB2::generate_smtlib2_from_clause(frames[i], cnf_smt2, map2,
-//                        SMTLIB2::uncomp,
-//                        NULL);
-//
-//        #ifdef DEBUG
-//                std::cout << "IC3::Frame smtlib to clause" << std::endl;
-//                for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-//                std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-//        #endif
-//                cnf_smt2.clear(); // clear strings
         frames[i].push_back(b);
-//        std::cout << frames[i].size() << std::endl;
-//        // get SMT2 string corresponding to frames[k-1]
-//                        SMTLIB2::generate_smtlib2_from_clause(frames[i], cnf_smt2, map2,
-//                                SMTLIB2::uncomp,
-//                                NULL);
-//
-//                #ifdef DEBUG
-//                        std::cout << "IC3::Frame smtlib to clause" << std::endl;
-//                        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-//                        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-//                #endif
-//
-//                        cnf_smt2.clear(); // clear strings
     }
     return true;
 }

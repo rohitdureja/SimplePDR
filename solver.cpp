@@ -105,13 +105,14 @@ std::vector<std::string> Solver::get_model() {
     std::vector<std::string> model;
 
     unsigned int num = Z3_model_get_num_consts(c, m);
-    for(unsigned int i  = 0 ; i < num ; ++i) {
+    for (unsigned int i = 0; i < num; ++i) {
         Z3_ast inter;
-        inter = Z3_model_get_const_interp(c, m, Z3_model_get_const_decl(c, m, i));
-        std::string sym =  Z3_get_symbol_string(c,
-                Z3_get_decl_name(c,Z3_model_get_const_decl(c, m, i)));
-        if(!((std::string)Z3_ast_to_string(c,inter)).compare("false"))
-            model.push_back("!"+sym);
+        inter = Z3_model_get_const_interp(c, m,
+                Z3_model_get_const_decl(c, m, i));
+        std::string sym = Z3_get_symbol_string(c,
+                Z3_get_decl_name(c, Z3_model_get_const_decl(c, m, i)));
+        if (!((std::string) Z3_ast_to_string(c, inter)).compare("false"))
+            model.push_back("!" + sym);
         else
             model.push_back(sym);
     }
