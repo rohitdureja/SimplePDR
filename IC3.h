@@ -34,7 +34,7 @@ private:
     Solver::Solver * solver;
 
     /* Keep track of IC3 frames:
-     * Data structure is a vector of pointers to a vector of pointers
+     * Data structure is a vector of vectors of smart pointers
      * to clauses.
      *
      * Reference use:

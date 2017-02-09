@@ -607,7 +607,7 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 }
 
 IC3::~IC3() {
-//    delete solver;
+    delete solver;
 }
 
 } /* namespace IC3 */
