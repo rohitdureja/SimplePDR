@@ -17,8 +17,8 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#ifndef UTILS_H_
-#define UTILS_H_
+#ifndef INCLUDE_UTILS_UTILS_H_
+#define INCLUDE_UTILS_UTILS_H_
 #include <cstring>
 #include <string>
 #include <vector>
@@ -75,4 +75,4 @@ std::shared_ptr<Clause> cube_to_clause(std::vector<std::shared_ptr<Clause>>);
 }
 
 typedef Clause Cube;
-#endif /* UTILS_H_ */
+#endif /* INCLUDE_UTILS_UTILS_H_ */

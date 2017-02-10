@@ -17,7 +17,8 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#include "solver.h"
+#include <solver/solver.h>
+
 #include <vector>
 #include <string>
 

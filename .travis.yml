@@ -8,4 +8,6 @@ before_script:
   - mv z3-4.5.0-x64-ubuntu-14.04/ z3/
   - export LD_LIBRARY_PATH="z3/bin:$LD_LIBRARY_PATH"
 script:
-  - make all
+  - mkdir build
+  - cmake -D CMAKE_BUILD_TYPE=Debug ..
+  - make

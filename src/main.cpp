@@ -17,9 +17,10 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#include "model.h"
-#include "IC3.h"
 #include <memory>
+
+#include <model/model.h>
+#include <pdr/IC3.h>
 
 int main() {
     // Specify transition system

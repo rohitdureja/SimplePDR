@@ -17,8 +17,9 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#include "model.h"
-#include "utils.h"
+#include <model/model.h>
+
+#include <utils/utils.h>
 
 namespace Model {
 

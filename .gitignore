@@ -1,3 +1,4 @@
+build/
 massif.*
 z3/
 .settings/

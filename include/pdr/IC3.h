@@ -17,14 +17,14 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#ifndef IC3_H_
-#define IC3_H_
+#ifndef INCLUDE_PDR_IC3_H_
+#define INCLUDE_PDR_IC3_H_
 
-#include "model.h"
-#include "solver.h"
 #include <vector>
-#include "utils.h"
 #include <memory>
+#include <model/model.h>
+#include <solver/solver.h>
+#include <utils/utils.h>
 
 namespace IC3 {
 
@@ -78,4 +78,4 @@ public:
 }
 /* namespace IC3 */
 
-#endif /* IC3_H_ */
+#endif /* INCLUDE_PDR_IC3_H_ */

@@ -17,7 +17,8 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#include "IC3.h"
+#include <pdr/IC3.h>
+
 #include <memory>
 #include <set>
 

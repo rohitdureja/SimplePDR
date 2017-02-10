@@ -17,7 +17,8 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#include "utils.h"
+#include <utils/utils.h>
+
 #include <iostream>
 #include <climits>
 

@@ -17,12 +17,13 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#ifndef SOLVER_H_
-#define SOLVER_H_
+#ifndef INCLUDE_SOLVER_SOLVER_H_
+#define INCLUDE_SOLVER_SOLVER_H_
 #include "z3++.h"
 #include <string>
 #include <vector>
-#include "utils.h"
+
+#include <utils/utils.h>
 
 namespace Solver {
 
@@ -55,4 +56,4 @@ public:
 
 } /* namespace Solver */
 
-#endif /* SOLVER_H_ */
+#endif /* INCLUDE_SOLVER_SOLVER_H_ */

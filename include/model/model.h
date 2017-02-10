@@ -17,8 +17,8 @@
  *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
  *************************************************************************/
 
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef INCLUDE_MODEL_MODEL_H_
+#define INCLUDE_MODEL_MODEL_H_
 
 #include <iostream>
 #include <string>
@@ -26,8 +26,9 @@
 #include <cstdint>
 #include <cstdlib>
 #include <map>
-#include "utils.h"
 #include <memory>
+
+#include <utils/utils.h>
 
 namespace Model {
 
@@ -86,4 +87,4 @@ public:
 
 }
 
-#endif /* MODEL_H_ */
+#endif /* INCLUDE_MODEL_MODEL_H_ */
