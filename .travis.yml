@@ -9,5 +9,6 @@ before_script:
   - export LD_LIBRARY_PATH="z3/bin:$LD_LIBRARY_PATH"
 script:
   - mkdir build
+  - cd build
   - cmake -D CMAKE_BUILD_TYPE=Debug ..
   - make
