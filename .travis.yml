@@ -6,7 +6,8 @@ before_script:
   - wget --no-parent https://github.com/Z3Prover/z3/releases/download/z3-4.5.0/z3-4.5.0-x64-ubuntu-14.04.zip
   - unzip z3-4.5.0-x64-ubuntu-14.04.zip
   - mv z3-4.5.0-x64-ubuntu-14.04/ z3/
-  - export LD_LIBRARY_PATH="z3/bin:$LD_LIBRARY_PATH"
+  - cp z3/bin/libz3.so /usr/lib
+  - cp -r z3/include/* /usr/lib
 script:
   - mkdir build
   - cd build
