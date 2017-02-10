@@ -7,7 +7,7 @@ before_script:
   - unzip z3-4.5.0-x64-ubuntu-14.04.zip
   - mv z3-4.5.0-x64-ubuntu-14.04/ z3/
   - sudo cp z3/bin/libz3.so /usr/lib
-  - sudo cp -r z3/include/* /usr/lib
+  - sudo cp -r z3/include/* /usr/include
 script:
   - mkdir build
   - cd build
