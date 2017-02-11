@@ -36,6 +36,7 @@ enum type {
 
 class Solver {
 private:
+    int calls = 0;
     z3::context c;
     z3::solver * s;
     unsigned int nsymbols;

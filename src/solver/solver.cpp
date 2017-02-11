@@ -59,6 +59,7 @@ void Solver::add_assertion(const std::string assertion) {
 }
 
 result Solver::check_sat() {
+    calls++;
 #ifdef DEBUG
     std::cout << "Z3::(check-sat)\n";
 #endif
@@ -122,6 +123,7 @@ std::vector<std::string> Solver::get_model() {
 }
 
 Solver::~Solver() {
+    std::cout << calls << std::endl;
     delete s;
 }
 
