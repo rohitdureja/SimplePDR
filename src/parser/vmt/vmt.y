@@ -31,7 +31,7 @@ statement		: DECLARE_FUN declaration
 declaration		: IDENTIFIER OP CP type
 				;
 
-definition		: IDENTIFIER OP CP type expr
+definition		: DEFINE OP CP type expr
 				;
 
 type			: _BOOLEAN  { printf ("hello\n"); }
@@ -46,10 +46,11 @@ relation		: simple_expr asymbol simple_expr
 				| simple_expr asymbol
 				;
 
-simple_expr		: IDENTIFIER
-				| OP NOT IDENTIFIER CP
-				| OP AND IDENTIFIER simple_expr CP
-				| OR IDENTIFIER simple_expr CP
+simple_expr		: IDENTIFIER { printf ("%s\n", $1); }
+				| DEFINE { printf ("%s\n", $1); }
+				| OP NOT simple_expr CP
+				| OP AND simple_expr simple_expr CP
+				| OP OR simple_expr simple_expr CP
 				;
 
 asymbol			: 
@@ -61,9 +62,10 @@ asymbol			:
 
 %%
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	yyparse();
+	return 0;
 }
 
 yyerror(char *s)
