@@ -8,6 +8,8 @@ before_script:
   - mv z3-4.5.0-x64-ubuntu-14.04/ z3/
   - sudo cp z3/bin/libz3.so /usr/lib
   - sudo cp -r z3/include/* /usr/include
+  - sudo apt-get install flex
+  - sudo apt-get install bison
 script:
   - mkdir build
   - cd build
