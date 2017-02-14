@@ -21,10 +21,12 @@
 
 #include <model/model.h>
 #include <pdr/IC3.h>
-#include "../include/parser/parser.h"
+#include <parser/parser.h>
 
 int
 main( const int argc, const char **argv ) {
+
+
     // Specify transition system
 //    std::shared_ptr<Model::Model> M(new Model::Model());
 

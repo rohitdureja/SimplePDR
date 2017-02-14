@@ -23,6 +23,9 @@ using token = Parser::VMT_Parser::token;
 %option c++
 
 %%
+%{
+yylval = lval;
+%}
 ^"(".*"set-info".*")"$          { /* ignore first line */ }
 "set-logic"                     { return token::SET_LOGIC; }
 "set-option"                    { return token::SET_OPTION; }
@@ -40,7 +43,7 @@ using token = Parser::VMT_Parser::token;
 [0-9]+                          { return token::INDEX ; }
 "Int"                           { return token::_INTEGER ; }
 "Bool"                          { return token::_BOOLEAN ; }
-";".*                           { return token::COMMENT ; }
+";".*                           { /* ignore comments */ }
 "!"                             { return token::ANNOTATION ; }
 "or"                            { return token::OR ; }
 "not"                           { return token::NOT ; }
@@ -48,8 +51,10 @@ using token = Parser::VMT_Parser::token;
 "="				                { return token::EQUAL; }
 "true"                          { return token::_TRUE ; }
 "false"                         { return token::_FALSE ; }
-".def_"[0-9]+                   { return token::DEFINE ; }
-[a-zA-Z0-9\.\_]+                { return token::IDENTIFIER ; }
+"."[a-zA-Z0-9\.\_]+                { yylval->build<std::string>(yytext);
+                                  return token::DEFINE ; }
+[a-zA-Z0-9\.\_]+                { yylval->build<std::string>(yytext);
+                                  return token::IDENTIFIER ; }
 \n                              { /* ignore newline */ }
 " "                             { /* ignore whitespace */ }
 .                               { return 0;/* process default */ }

@@ -9,6 +9,8 @@
     namespace Parser {
     class VMT_Driver;
     class VMT_Scanner;
+    class ast_node;
+    typedef ast_node * ast;
     }
 
 // The following definitions is missing when %locations isn't used
@@ -39,24 +41,32 @@
 
 }
 
+%define api.value.type variant
+%define parse.assert
+
 /* declare tokens */
-%token OP CP
-%token DECLARE_FUN DEFINE_FUN DECLARE_SORT DEFINE_SORT ASSERT
-%token SET_LOGIC SET_OPTION
-%token _TRUE _FALSE
-%token _BOOLEAN _INTEGER
-%token NEXT INIT INVAR TRANS
-%token ANNOTATION
-%token IDENTIFIER DEFINE
-%token AND OR NOT EQUAL
-%token INDEX
-%token COMMENT
+%token          		OP CP
+%token          		DECLARE_FUN DEFINE_FUN DECLARE_SORT DEFINE_SORT ASSERT
+%token          		SET_LOGIC SET_OPTION
+%token          		_TRUE _FALSE
+%token          		_BOOLEAN _INTEGER
+%token          		NEXT INIT INVAR TRANS
+%token          		ANNOTATION
+%token <std::string>   	IDENTIFIER DEFINE
+%token          		AND OR NOT EQUAL
+%token          		INDEX
+%token          		COMMENT
+
+%type<std::string> type
+%type<ast> simple_expr expr
+%type<std::vector<ast>> operands
 
 %locations
 
+
 %%
 
-file            : OP statement CP   { std::cout << "hello\n"; }
+file            : OP statement CP 
                 | file OP statement CP
                 ;
 
@@ -67,37 +77,42 @@ statement       : DECLARE_FUN declaration
                 | ASSERT _TRUE
                 ;
 
-declaration     : IDENTIFIER OP CP type
+declaration     : IDENTIFIER OP CP type 
                 ;
 
-definition      : DEFINE OP CP type expr
+definition      : DEFINE OP CP type expr                  
                 ;
 
-type            : _BOOLEAN  { std::cout << "hello\n"; }
-                | _INTEGER
+type            : _BOOLEAN {$$ = "Bool";}
+                | _INTEGER {$$ = "Int";}
                 ;
 
-expr            : OP ANNOTATION simple_expr annotation CP
-                | simple_expr
+expr            : OP ANNOTATION simple_expr annotation CP 
+				  { $$ = $3; }
+                | simple_expr { $$ = $1; }
                 ;
 
 annotation		:
-				| NEXT simple_expr annotation
+				| NEXT simple_expr annotation 
 				| INIT _TRUE annotation
 				| INVAR INDEX annotation
 				| TRANS _TRUE annotation
 				;
 				
 
-simple_expr     : IDENTIFIER { std::cout << "hello\n"; }
-                | DEFINE { std::cout << "hello\n"; }
-                | OP NOT simple_expr CP
-                | OP AND simple_expr simple_expr CP
-                | OP OR simple_expr simple_expr CP
-                | OP EQUAL simple_expr simple_expr CP
-                | _TRUE
+simple_expr     : IDENTIFIER           { $$ = driver.mk_var($1); }
+				| DEFINE			   { $$ = driver.add_ast($1);}
+                | OP NOT operands CP   { $$ = driver.mk_not($3); }
+                | OP AND operands CP   { $$ = driver.mk_and($3); }
+                | OP OR operands CP    { $$ = driver.mk_or($3); }
+                | OP EQUAL operands CP { $$ = driver.mk_eq($3); }
+                | _TRUE 
                 | _FALSE
                 ;
+
+operands		: simple_expr operands { $$.push_back($1); }
+				| simple_expr { $$.push_back($1); }
+				;
 
 %%
 

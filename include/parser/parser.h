@@ -7,9 +7,38 @@
 
 #include <parser.tab.hh>
 #include "scanner.h"
+#include <vector>
+#include <string>
+#include <map>
+#include <memory>
 
 namespace Parser{
 
+/* Class to handle AST nodes */
+enum otype {AND, OR, NOT, SYM, EQ};
+
+typedef ast_node * ast;
+
+class ast_node {
+private:
+    std::vector<ast> operands;
+    otype op;
+    std::string id = "";
+
+public:
+
+    void add_operand(ast ast) {
+        operands.push_back(ast);
+    }
+    void node_type(otype t) {
+        op = t;
+    }
+    void add_name(std::string str) {
+        id = str;
+    }
+};
+
+/* Main driver class */
 class VMT_Driver{
 public:
    VMT_Driver() {
@@ -18,23 +47,33 @@ public:
 
    virtual ~VMT_Driver();
    
-   /** 
-    * parse - parse from a file
-    * @param filename - valid string with input file
-    */
+   /* parse the given file */
    void parse( const char * const filename );
-   /** 
-    * parse - parse from a c++ input stream
-    * @param is - std::istream&, valid input stream
-    */
+
+   /* read from the given file */
    void parse( std::istream &iss );
+
+   /* Helper functions to create ASTs */
+   ast mk_var(std::string);
+   void mk_expr(ast);
+   ast mk_or(std::vector<ast>);
+   ast mk_and(std::vector<ast>);
+   ast mk_not(std::vector<ast>);
+   ast mk_eq(std::vector<ast>);
+   ast add_ast(std::string);
 
 private:
 
+   /* utility to handle parser expressions */
    void parse_helper( std::istream &stream );
 
    Parser::VMT_Parser  *parser  = nullptr;
    Parser::VMT_Scanner *scanner = nullptr;
+
+   std::map<ast, ast> curr_next_map;
+
+   std::map<std::string, ast> ast_map;
+
 
 };
 } /* end namespace MC */

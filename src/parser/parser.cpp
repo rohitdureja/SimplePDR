@@ -77,4 +77,56 @@ VMT_Driver::parse_helper( std::istream &stream )
    return;
 }
 
+ast
+VMT_Driver::mk_var(std::string symbol) {
+
+    ast node = new ast_node;
+    node->add_name(symbol); node->node_type(SYM);
+    return node;
+}
+
+ast
+VMT_Driver::mk_or(std::vector<ast> operands) {
+
+    ast node = new ast_node;
+    node->node_type(OR);
+    for(unsigned int i = 0 ; i < operands.size() ; i++)
+        node->add_operand(operands[i]);
+    return node;
+}
+
+ast
+VMT_Driver::mk_and(std::vector<ast> operands) {
+
+    ast node = new ast_node;
+    node->node_type(AND);
+    for(unsigned int i = 0 ; i < operands.size() ; i++)
+        node->add_operand(operands[i]);
+    return node;
+}
+
+ast
+VMT_Driver::mk_not(std::vector<ast> operands) {
+
+    ast node = new ast_node;
+    node->node_type(NOT);
+    for(unsigned int i = 0 ; i < operands.size() ; i++)
+        node->add_operand(operands[i]);
+    return node;
+}
+
+ast
+VMT_Driver::mk_eq(std::vector<ast> operands) {
+
+    ast node = new ast_node;
+    node->node_type(EQ);
+    for(unsigned int i = 0 ; i < operands.size() ; i++)
+        node->add_operand(operands[i]);
+    return node;
+}
+
+ast
+VMT_Driver::add_ast(std::string) {
+}
+
 }
