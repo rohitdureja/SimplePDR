@@ -4,7 +4,6 @@
 #include <fstream>
 #include <cassert>
 
-
 namespace Parser {
    
 VMT_Driver::~VMT_Driver()
@@ -80,9 +79,16 @@ VMT_Driver::parse_helper( std::istream &stream )
 ast
 VMT_Driver::mk_var(std::string symbol) {
 
-    ast node = new ast_node;
-    node->add_name(symbol); node->node_type(SYM);
-    return node;
+    if(var_map.find(symbol) == var_map.end()) {
+        ast node = new ast_node;
+        node->add_name(symbol); node->node_type(SYM);
+        var_map[symbol] = node;
+        return node;
+    }
+    else {
+        return var_map[symbol];
+    }
+
 }
 
 ast
@@ -126,7 +132,23 @@ VMT_Driver::mk_eq(std::vector<ast> operands) {
 }
 
 ast
-VMT_Driver::add_ast(std::string) {
+VMT_Driver::get_ast(std::string str) {
+    return ast_map[str];
+}
+
+void
+VMT_Driver::add_definition(std::string str, ast a) {
+    ast_map[str] = a;
+}
+
+std::map<std::string, ast>
+VMT_Driver::get_var_map() {
+    return var_map;
+}
+
+std::map<std::string, ast>
+VMT_Driver::get_def_map() {
+    return ast_map;
 }
 
 }

@@ -23,6 +23,45 @@
 #include <pdr/IC3.h>
 #include <parser/parser.h>
 
+void generate_string(Parser::ast a) {
+    if(a->get_ast_type() == Parser::AND) {
+//        std::cout << "and" << std::endl;
+//        std::cout << a->get_operands().size() << std::endl;
+        std::cout << " (and ";
+        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
+            generate_string(a->get_operands()[i]);
+        }
+        std::cout << ")";
+    }
+    else if(a->get_ast_type() == Parser::OR) {
+        std::cout << " (or ";
+        std::cout << a->get_operands().size() << std::endl;
+        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
+                    generate_string(a->get_operands()[i]);
+                }
+        }
+    else if(a->get_ast_type() == Parser::NOT) {
+//        std::cout << "not" << std::endl;
+//                std::cout << a->get_operands().size() << std::endl;
+        std::cout << " (not ";
+        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
+                    generate_string(a->get_operands()[i]);
+                }
+        std::cout << ")";
+        }
+    else if(a->get_ast_type() == Parser::EQ) {
+        std::cout << " (= ";
+            for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
+                        generate_string(a->get_operands()[i]);
+                    }
+            std::cout << ")";
+            }
+    else if (a->get_ast_type() == Parser::SYM) {
+            std::cout << a->get_ast_string() ;
+        }
+    return;
+}
+
 int
 main( const int argc, const char **argv ) {
 
@@ -150,6 +189,41 @@ main( const int argc, const char **argv ) {
           {
              /** assume file, prod code, use stat to check **/
              driver.parse( argv[1] );
+             /* file parsed successfully  */
+//             std::cout << driver.get_var_map().size() << std::endl;
+////             for(unsigned int i = 0 ; i < driver.get_def_map().size() ; ++i)
+////             {
+//
+////                 std::map<std::string, Parser::ast> m = driver.get_def_map();
+//////                 for(std::map<std::string,Parser::ast>::iterator it = m.begin(); it != m.end(); ++it) {
+//////                     std::cout << "here";
+//////                     std::cout << it->first << "\n";
+//////                 }
+////                 std::string ex = ".def_27";
+////
+////                 Parser::ast a = m[ex];
+////                 generate_string(a);
+//
+//                 std::map<Parser::ast, Parser::ast> cn = driver.get_curr_next();
+//                 for(std::map<Parser::ast,Parser::ast>::iterator it = cn.begin(); it != cn.end(); ++it) {
+//                                      Parser::ast curr = it->first;
+//                                      Parser::ast next = cn[it->first];
+//                                      generate_string(curr);
+//                                      generate_string(next);
+//                  }
+//
+//                 std::cout << "\n\n";
+//                 generate_string(driver.trans);
+//
+//                 std::cout << "\n\n";
+//                                  generate_string(driver.init);
+
+
+
+//                 std::cout << a->get_ast_string() << std::endl;
+
+//             }
+//             std::cout << driver.get_def_map().size() << std::endl;
           }
 
        }
@@ -158,6 +232,8 @@ main( const int argc, const char **argv ) {
           /** exit with failure condition **/
           return ( EXIT_FAILURE );
        }
+
+
        return( EXIT_SUCCESS );
 }
 
