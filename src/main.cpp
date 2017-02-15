@@ -27,15 +27,14 @@ void generate_string(Parser::ast a) {
     if(a->get_ast_type() == Parser::AND) {
 //        std::cout << "and" << std::endl;
 //        std::cout << a->get_operands().size() << std::endl;
-        std::cout << " (and ";
+        std::cout << " (and";
         for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
             generate_string(a->get_operands()[i]);
         }
         std::cout << ")";
     }
     else if(a->get_ast_type() == Parser::OR) {
-        std::cout << " (or ";
-        std::cout << a->get_operands().size() << std::endl;
+        std::cout << " (or";
         for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
                     generate_string(a->get_operands()[i]);
                 }
@@ -43,21 +42,21 @@ void generate_string(Parser::ast a) {
     else if(a->get_ast_type() == Parser::NOT) {
 //        std::cout << "not" << std::endl;
 //                std::cout << a->get_operands().size() << std::endl;
-        std::cout << " (not ";
+        std::cout << " (not";
         for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
                     generate_string(a->get_operands()[i]);
                 }
         std::cout << ")";
         }
     else if(a->get_ast_type() == Parser::EQ) {
-        std::cout << " (= ";
+        std::cout << " (=";
             for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
                         generate_string(a->get_operands()[i]);
                     }
             std::cout << ")";
             }
     else if (a->get_ast_type() == Parser::SYM) {
-            std::cout << a->get_ast_string() ;
+            std::cout << " " << a->get_ast_string() << "";
         }
     return;
 }
@@ -204,19 +203,19 @@ main( const int argc, const char **argv ) {
 ////                 Parser::ast a = m[ex];
 ////                 generate_string(a);
 //
-//                 std::map<Parser::ast, Parser::ast> cn = driver.get_curr_next();
-//                 for(std::map<Parser::ast,Parser::ast>::iterator it = cn.begin(); it != cn.end(); ++it) {
-//                                      Parser::ast curr = it->first;
-//                                      Parser::ast next = cn[it->first];
-//                                      generate_string(curr);
-//                                      generate_string(next);
-//                  }
-//
-//                 std::cout << "\n\n";
-//                 generate_string(driver.trans);
-//
-//                 std::cout << "\n\n";
-//                                  generate_string(driver.init);
+                 std::map<Parser::ast, Parser::ast> cn = driver.get_curr_next();
+                 for(std::map<Parser::ast,Parser::ast>::iterator it = cn.begin(); it != cn.end(); ++it) {
+                                      Parser::ast curr = it->first;
+                                      Parser::ast next = cn[it->first];
+                                      generate_string(curr);
+                                      generate_string(next);
+                  }
+
+                 std::cout << "\n\n";
+                 generate_string(driver.trans);
+
+                 std::cout << "\n\n";
+                 generate_string(driver.init);
 
 
 

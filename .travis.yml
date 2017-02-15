@@ -2,16 +2,30 @@ language: cpp
 sudo: required
 dist: trusty
 
+before_install:
+  - sudo apt-get install flex
+  - sudo apt-get install bison
+
 before_script:
   - wget --no-parent https://github.com/Z3Prover/z3/releases/download/z3-4.5.0/z3-4.5.0-x64-ubuntu-14.04.zip
   - unzip z3-4.5.0-x64-ubuntu-14.04.zip
   - mv z3-4.5.0-x64-ubuntu-14.04/ z3/
   - sudo cp z3/bin/libz3.so /usr/lib
   - sudo cp -r z3/include/* /usr/include
-  - sudo apt-get install flex
-  - sudo apt-get install bison
+
 script:
   - mkdir build
   - cd build
   - cmake -D CMAKE_BUILD_TYPE=Debug ..
   - make
+  - ./SimplePDR ../benchmarks/sample/m1.vmt
+  - ./SimplePDR ../benchmarks/sample/m2.vmt
+  - ./SimplePDR ../benchmarks/sample/m3.vmt
+  - ./SimplePDR ../benchmarks/sample/m4.vmt
+  - ./SimplePDR ../benchmarks/sample/m5.vmt
+  - ./SimplePDR ../benchmarks/sample/m6.vmt
+  - ./SimplePDR ../benchmarks/sample/m7.vmt
+  - ./SimplePDR ../benchmarks/sample/m8.vmt
+
+
+

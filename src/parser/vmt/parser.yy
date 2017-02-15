@@ -147,8 +147,15 @@ simple_expr     : IDENTIFIER           { $$ = driver.mk_var($1); }
                 | _FALSE
                 ;
 
-operands		: simple_expr { $$.push_back($1); }
-				| operands simple_expr { $$.push_back($2); }
+operands		: simple_expr { 
+							    $$.push_back($1);
+							    }
+				| operands simple_expr { 
+				
+				for(unsigned int i = 0 ; i < $1.size() ; ++i)
+					$$.push_back($1[i]);
+				$$.push_back($2); 
+				}
 				;
 
 %%
