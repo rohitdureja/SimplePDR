@@ -1,122 +1,96 @@
-#ifndef __MCDRIVER_HPP__
-#define __MCDRIVER_HPP__ 1
+/*************************************************************************
+ * Copyright (C) 2017 by Rohit Dureja                                    *
+ *                                                                       *
+ * This file is part of SimplePDR.                                       *
+ *                                                                       *
+ *  SimplePDR is free software: you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  SimplePDR is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with SimplePDR.  If not, see <http://www.gnu.org/licenses/>.   *
+ *************************************************************************/
 
-#include <string>
+#ifndef __PARSER_HPP__
+#define __PARSER_HPP__
+
 #include <cstddef>
-#include <istream>
-
-#include <parser.tab.hh>
-#include "scanner.h"
+#include <iostream>
 #include <vector>
 #include <string>
 #include <map>
-#include <memory>
+#include "scanner.h"
+#include <utils/ast.h>
 
-namespace Parser{
-
-/* Class to handle AST nodes */
-enum otype {AND, OR, NOT, SYM, EQ};
-enum atype {INIT, TRANS, NEXT, INVAR, NONE};
-
-class ast_node;
-class annotation;
-
-class annotation {
-public:
-    std::vector<atype> type;
-    ast_node * next;
-};
-
-class ast_node {
-private:
-    std::vector<ast> operands;
-    otype op;
-    std::string id = "";
-    std::vector<annotation *> annotations;
-
-public:
-
-    void add_operand(ast ast) {
-        operands.push_back(ast);
-    }
-    void node_type(otype t) {
-        op = t;
-    }
-    void add_name(std::string str) {
-        id = str;
-    }
-
-    std::vector<ast> get_operands() {
-        return operands;
-    }
-
-    otype get_ast_type() {
-        return op;
-    }
-
-    std::string get_ast_string() {
-        return id;
-    }
-};
+namespace Parser {
 
 /* Main driver class */
-class VMT_Driver{
+class VMT_Driver {
 public:
-   VMT_Driver() {
-    
-   }
+    VMT_Driver() {
+    }
 
-   virtual ~VMT_Driver();
-   
-   /* parse the given file */
-   void parse( const char * const filename );
+    virtual ~VMT_Driver();
 
-   /* read from the given file */
-   void parse( std::istream &iss );
+    /* parse the given file */
+    void parse(const char * const filename);
 
-   /* Helper functions to create ASTs */
-   ast mk_var(std::string);
-   void mk_expr(ast);
-   ast mk_or(std::vector<ast>);
-   ast mk_and(std::vector<ast>);
-   ast mk_not(std::vector<ast>);
-   ast mk_eq(std::vector<ast>);
-   ast get_ast(std::string);
-   void add_definition(std::string, ast a);
+    /* read from the given file */
+    void parse(std::istream &iss);
 
-   std::vector<ast> temp;
+    /* Helper functions to create ASTs */
+    AST::ast_node * mk_var(std::string);
+    void mk_expr(AST::ast_node *);
+    AST::ast_node * mk_or(std::vector<AST::ast_node *>);
+    AST::ast_node * mk_and(std::vector<AST::ast_node *>);
+    AST::ast_node * mk_not(std::vector<AST::ast_node *>);
+    AST::ast_node * mk_eq(std::vector<AST::ast_node *>);
+    AST::ast_node * mk_bool(bool);
+    AST::ast_node * get_ast(std::string);
+    void add_definition(std::string, AST::ast_node * a);
 
-   /* Accessor functions */
-   std::map<std::string, ast> get_var_map();
-   std::map<std::string, ast> get_def_map();
+    /* Accessor functions */
+    std::map<std::string, AST::ast_node *> get_var_map();
+    std::map<std::string, AST::ast_node *> get_def_map();
 
-   void add_curr_next(ast c, ast n) {
-       curr_next_map[c] = n;
-   }
+    /* Add current and next version of a symbol */
+    void add_curr_next(AST::ast_node * c, AST::ast_node * n) {
+        curr_next_map[c] = n;
+    }
 
-   std::map<ast, ast> get_curr_next() {
-          return curr_next_map;
-      }
-   ast trans = nullptr;
-   ast init = nullptr;
+    /* Retrive map of current and next version of symbols */
+    std::map<AST::ast_node *, AST::ast_node *> get_curr_next() {
+        return curr_next_map;
+    }
 
+    /* Model read from VMT File */
+    AST::ast_node * trans = nullptr;
+    AST::ast_node * init = nullptr;
+    AST::ast_node * invar = nullptr;
 
 private:
 
-   /* utility to handle parser expressions */
-   void parse_helper( std::istream &stream );
+    /* utility to handle parser expressions */
+    void parse_helper(std::istream &stream);
 
-   Parser::VMT_Parser  *parser  = nullptr;
-   Parser::VMT_Scanner *scanner = nullptr;
+    /* Pointer to the scanner and parser */
+    Parser::VMT_Parser *parser = nullptr;
+    Parser::VMT_Scanner *scanner = nullptr;
 
-   std::map<std::string, ast> ast_map; // map of definitions
-   std::map<std::string, ast> var_map; // map of variables
-   std::map<ast, ast> curr_next_map; // map of curr and next states
+    std::map<std::string,
+             AST::ast_node *> ast_map; // map of definitions
 
+    std::map<std::string,
+             AST::ast_node *> var_map; // map of variables
 
-
-
-
+    std::map<AST::ast_node *,
+             AST::ast_node *> curr_next_map; // map of curr and next states
 };
-} /* end namespace MC */
-#endif /* END __MCDRIVER_HPP__ */
+} /* end namespace Parser */
+#endif /* END __PARSER_HPP__ */

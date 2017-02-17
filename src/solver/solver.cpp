@@ -56,6 +56,7 @@ void Solver::add_assertion(const std::string assertion) {
     // the C++ interface
     z3::expr formula(c, parsed1);
     s->add(formula);
+    std::cout << *s << std::endl;
 }
 
 result Solver::check_sat() {

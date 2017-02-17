@@ -29,6 +29,7 @@
 #include <memory>
 
 #include <utils/utils.h>
+#include <parser/parser.h>
 
 namespace Model {
 
@@ -45,9 +46,12 @@ class Model {
      * Vector containing pointer to clauses clauses for the
      * transition system.
      */
-    std::vector<std::shared_ptr<Clause>> trans;
-    std::vector<std::shared_ptr<Clause>> init;
-    std::vector<std::shared_ptr<Clause>> prop;
+    AST::ast_node * trans = nullptr;
+    AST::ast_node * init = nullptr;
+    AST::ast_node * prop = nullptr;
+
+    std::map<std::string, AST::ast_node *> var_map; // variables
+    std::map<AST::ast_node *, AST::ast_node *> curr_next_map; // curr -> next
 
     // Helpers objects
     std::map<std::string, unsigned char> var_map1; //	name -> int
@@ -56,28 +60,23 @@ class Model {
     std::vector<std::string> str_vars;
     unsigned char vcount;
 
+    void add_variable(const std::string);
+    void add_variable_relation(const std::string, const std::string);
+
 public:
 
     Model() {
         vcount = 1;
     }
-//    ~Model() {
-//        for (unsigned char i = 0; i < trans.size(); ++i)
-//            delete trans[i];
-//        for (unsigned char i = 0; i < init.size(); ++i)
-//            delete init[i];
-//        for (unsigned char i = 0; i < prop.size(); ++i)
-//            delete prop[i];
-//    }
+
+    void read_model(const char *);
 
     std::vector<std::string> get_variables();
-    void add_variable(const std::string);
-    void add_variable_relation(const std::string, const std::string);
 
-    void add_clause(const type, const std::string);
-    std::vector<std::shared_ptr<Clause>> get_trans();
-    std::vector<std::shared_ptr<Clause>> get_init();
-    std::vector<std::shared_ptr<Clause>> get_prop();
+//    void add_clause(const type, const std::string);
+    AST::ast_node * get_trans();
+    AST::ast_node * get_init();
+    AST::ast_node * get_prop();
     void show_trans();
     void show_init();
     std::map<unsigned char, std::string> * get_var_map2();

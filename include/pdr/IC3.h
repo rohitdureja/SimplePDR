@@ -25,6 +25,7 @@
 #include <model/model.h>
 #include <solver/solver.h>
 #include <utils/utils.h>
+#include <utils/ast.h>
 
 namespace IC3 {
 
@@ -60,12 +61,17 @@ private:
      * }
      */
     std::vector<std::vector<std::shared_ptr<Clause>>>frames;
-    std::vector<std::shared_ptr<Clause>> init;
-    std::vector<std::shared_ptr<Clause>> trans;
-    std::vector<std::shared_ptr<Clause>> prop;
+    AST::ast_node * init;
+    AST::ast_node * trans;
+    AST::ast_node * prop;
     std::map<std::string, unsigned char> * map1;
     std::map<unsigned char, std::string> * map2;
     std::map<std::string, std::string> * nmap;
+
+    std::string init_str;
+    std::string invar_str;
+    std::string neg_invar_str;
+    std::string trans_str;
 
     bool check_proof_obligation(std::vector<std::shared_ptr<Clause>>, unsigned int);
 

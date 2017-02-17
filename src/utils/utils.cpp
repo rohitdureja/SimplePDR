@@ -22,6 +22,46 @@
 #include <iostream>
 #include <climits>
 
+void generate_string(std::string &str, AST::ast_node* a) {
+    if (a != nullptr) {
+        if (a->get_ast_type() == AST::AND) {
+            str = str + " (and";
+            for (unsigned int i = 0; i < a->get_operands().size(); ++i) {
+                generate_string(str, a->get_operands()[i]);
+            }
+            str = str + ")";
+        } else if (a->get_ast_type() == AST::OR) {
+            str = str + " (or";
+            for (unsigned int i = 0; i < a->get_operands().size(); ++i) {
+                generate_string(str, a->get_operands()[i]);
+            }
+            str = str + ")";
+        } else if (a->get_ast_type() == AST::NOT) {
+            str = str + " (not";
+            for (unsigned int i = 0; i < a->get_operands().size(); ++i) {
+                generate_string(str, a->get_operands()[i]);
+            }
+            str = str + ")";
+        } else if (a->get_ast_type() == AST::EQ) {
+            str = str + " (=";
+            for (unsigned int i = 0; i < a->get_operands().size(); ++i) {
+                generate_string(str, a->get_operands()[i]);
+            }
+            str = str + ")";
+        } else if (a->get_ast_type() == AST::SYM) {
+            str = str + " " + a->get_ast_string() + " ";
+        } else if (a->get_ast_type() == AST::BOOL) {
+            if (a->get_ast_val() == true)
+                str = str + "true";
+            else
+                str = str + "false";
+        }
+    }
+    else
+        str = "(asssert true)";
+    return;
+}
+
 void split(const std::string &s, const char* delim,
         std::vector<std::string> & v) {
     char * dup = strdup(s.c_str());
@@ -69,8 +109,7 @@ void generate_smtlib2_from_clause(
         std::map<unsigned char, std::string> * map, smt_str_type type,
         std::map<std::string, std::string> * nmap) {
 
-    if (nmap != NULL)
-    {
+    if (nmap != NULL) {
         if (type == uncomp) {
             if (clauses.size() == 0) {
                 str_clause.push_back("(assert true)");
@@ -89,8 +128,7 @@ void generate_smtlib2_from_clause(
                                             + (*nmap)[(*map)[-literals[0]]]
                                             + ")";
                     str_clause[i] = str_clause[i] + ")";
-                }
-                else {
+                } else {
                     str_clause.push_back("(assert (or");
                     // iterative over literals in i-th clause
                     for (unsigned int j = 0; j < literals.size(); ++j) {
@@ -105,13 +143,11 @@ void generate_smtlib2_from_clause(
                     str_clause[i] = str_clause[i] + "))";
                 }
             }
-        }
-        else if (type == comp) {
+        } else if (type == comp) {
             if (clauses.size() == 0) {
                 str_clause.push_back("(assert false)");
                 return;
-            }
-            else if (clauses.size() == 1) {
+            } else if (clauses.size() == 1) {
                 std::shared_ptr<Clause> clause = clauses[0]; // get i-th clause
                 std::vector<signed char> literals = clause->get_literals();
                 if (literals.size() == 1) {
@@ -125,8 +161,7 @@ void generate_smtlib2_from_clause(
                                             + (*nmap)[(*map)[-literals[0]]];
 
                     str_clause[0] = str_clause[0] + ")";
-                }
-                else {
+                } else {
                     str_clause.push_back("(assert (and");
                     // iterative over literals in i-th clause
                     for (unsigned int j = 0; j < literals.size(); ++j) {
@@ -141,8 +176,7 @@ void generate_smtlib2_from_clause(
                     }
                     str_clause[0] = str_clause[0] + "))";
                 }
-            }
-            else {
+            } else {
                 str_clause.push_back("(assert (or");
                 // iterate over all clauses
                 for (unsigned int i = 0; i < clauses.size(); ++i) {
@@ -157,8 +191,7 @@ void generate_smtlib2_from_clause(
                                         str_clause[0] + " "
                                                 + (*nmap)[(*map)[-literals[0]]];
 
-                    }
-                    else {
+                    } else {
                         str_clause[0] = str_clause[0] + " (and";
                         // iterative over literals in i-th clause
                         for (unsigned int j = 0; j < literals.size(); ++j) {
@@ -177,8 +210,7 @@ void generate_smtlib2_from_clause(
                 str_clause[0] = str_clause[0] + "))";
             }
         }
-    }
-    else {
+    } else {
         if (type == uncomp) {
             if (clauses.size() == 0) {
                 str_clause.push_back("(assert true)");
@@ -209,13 +241,11 @@ void generate_smtlib2_from_clause(
                     str_clause[i] = str_clause[i] + "))";
                 }
             }
-        }
-        else if (type == comp) {
+        } else if (type == comp) {
             if (clauses.size() == 0) {
                 str_clause.push_back("(assert false)");
                 return;
-            }
-            else if (clauses.size() == 1) {
+            } else if (clauses.size() == 1) {
                 std::shared_ptr<Clause> clause = clauses[0]; // get i-th clause
                 std::vector<signed char> literals = clause->get_literals();
                 if (literals.size() == 1) {
@@ -227,8 +257,7 @@ void generate_smtlib2_from_clause(
                                     str_clause[0] + " " + (*map)[-literals[0]];
 
                     str_clause[0] = str_clause[0] + ")";
-                }
-                else {
+                } else {
                     str_clause.push_back("(assert (and");
                     // iterative over literals in i-th clause
                     for (unsigned int j = 0; j < literals.size(); ++j) {
@@ -242,8 +271,7 @@ void generate_smtlib2_from_clause(
                     }
                     str_clause[0] = str_clause[0] + "))";
                 }
-            }
-            else {
+            } else {
                 str_clause.push_back("(assert (or");
                 // iterate over all clauses
                 for (unsigned int i = 0; i < clauses.size(); ++i) {
@@ -257,8 +285,7 @@ void generate_smtlib2_from_clause(
                                         str_clause[0] + " "
                                                 + (*map)[-literals[0]];
 
-                    }
-                    else {
+                    } else {
                         str_clause[0] = str_clause[0] + " (and";
                         // iterative over literals in i-th clause
                         for (unsigned int j = 0; j < literals.size(); ++j) {
@@ -283,25 +310,26 @@ void generate_smtlib2_from_clause(
 void generate_clause_from_smtlib2(
         std::vector<std::shared_ptr<Clause>> & clauses,
         std::vector<std::string> cube,
-        std::map<std::string, unsigned char> * map,
-        unsigned int nvar) {
+        std::map<std::string, unsigned char> * map, unsigned int nvar) {
 
     for (unsigned int i = 0; i < cube.size(); ++i) {
         std::shared_ptr<Clause> c(new Clause());
         if (cube[i][0] == '!') {
             cube[i].erase(cube[i].begin());
-            if((*map)[cube[i]] <= nvar) {
+            if ((*map)[cube[i]] >= nvar) {
+
                 c->add_literal(-(*map)[cube[i]]);
                 clauses.push_back(c);
             }
         } else {
-            if((*map)[cube[i]] <= nvar) {
+            if ((*map)[cube[i]] >= nvar) {
                 c->add_literal((*map)[cube[i]]);
                 clauses.push_back(c);
             }
         }
 
     }
+    std::cout << clauses.size() << std::endl;
 }
 
 std::shared_ptr<Clause> cube_to_clause(

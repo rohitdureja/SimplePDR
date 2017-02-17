@@ -25,8 +25,7 @@
 namespace IC3 {
 
 IC3::IC3(std::shared_ptr<Model::Model> M) {
-//	M->show_init();
-//    M->show_trans();
+
     solver = new Solver::Solver();
 
     map1 = M->get_var_map1();
@@ -39,13 +38,20 @@ IC3::IC3(std::shared_ptr<Model::Model> M) {
 
     // get pointer to initial states
     init = M->get_init();
+    generate_string(init_str, init);
+    init_str = "(assert " + init_str + ")";
 
     // get pointer to transition relation
     trans = M->get_trans();
+    generate_string(trans_str, trans);
+    trans_str = "(assert " + trans_str + ")";
 
-    // get pointer to transition relation
+    // get pointer to safety property
     prop = M->get_prop();
-
+    generate_string(invar_str, prop);
+    invar_str = "(assert " + invar_str + ")";
+    generate_string(neg_invar_str, prop);
+    neg_invar_str = "(assert (not " + neg_invar_str + "))";
 }
 
 /************************************************************************
@@ -77,7 +83,7 @@ IC3::IC3(std::shared_ptr<Model::Model> M) {
  ************************************************************************/
 
 bool IC3::prove() {
-    // helper string vector to hold SMTLIB2 formulas
+
     std::vector<std::string> cnf_smt2;
 
     /***************** find 0-step counterexample ******************
@@ -85,43 +91,12 @@ bool IC3::prove() {
 
     solver->push(); // create solver stack
 
-    // get SMT2 string corresponding to init
-    SMTLIB2::generate_smtlib2_from_clause(init, cnf_smt2, map2, SMTLIB2::uncomp,
-    NULL);
+    // add init to solver
+    solver->add_assertion(init_str);
 
-#ifdef DEBUG
-    std::cout << "IC3::Initial State (size = " << cnf_smt2.size()
-    << ")" << std::endl;
-    for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-    std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-    // iterate over the SMT2 strings for each clause
-    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-        std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-        solver->add_assertion(cnf_smt2[i]); // add clause to solver
-    }
-    cnf_smt2.clear(); // clear strings
 
-    // get SMT2 string corresponding to (not prop)
-    SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2, SMTLIB2::comp,
-    NULL);
-
-#ifdef DEBUG
-    std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
-    << ")" << std::endl;
-    for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-    std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-    // iterate over the SMT2 strings for each clause
-    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-        std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-        solver->add_assertion(cnf_smt2[i]); // add clause to solver
-    }
-    cnf_smt2.clear();
+    // add (not prop) to solver
+    solver->add_assertion(neg_invar_str);
 
     // checks satisfiability of (I \wedge \not P)
     if (solver->check_sat() == Solver::sat)
@@ -133,7 +108,8 @@ bool IC3::prove() {
      ************************* ends here ***************************/
 
     // first element of frame is init formula
-    frames.push_back(init);
+    std::vector<std::shared_ptr<Clause>> temp;
+    frames.push_back(temp); // adding dummy node
 
     unsigned int k = 1; // active frame number
     std::vector<std::shared_ptr<Clause>> m;
@@ -170,25 +146,8 @@ bool IC3::prove() {
         }
         cnf_smt2.clear(); // clear strings
 
-        // get SMT2 string corresponding to (not prop)
-        SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2,
-                SMTLIB2::comp,
-                NULL);
-
-#ifdef DEBUG
-        std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
-        << ")" << std::endl;
-        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-        // iterate over the SMT2 strings for each clause
-        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-            solver->add_assertion(cnf_smt2[i]); // add clause to solver
-        }
-        cnf_smt2.clear();
+        // add (not prop) to solver
+        solver->add_assertion(neg_invar_str);
 
         // checks satisfiability of (and frames[k] (not prop))
         while (solver->check_sat() == Solver::sat) {
@@ -231,26 +190,8 @@ bool IC3::prove() {
             }
             cnf_smt2.clear(); // clear strings
 
-            // get SMT2 string corresponding to (not prop)
-            SMTLIB2::generate_smtlib2_from_clause(prop, cnf_smt2, map2,
-                    SMTLIB2::comp,
-                    NULL);
-
-#ifdef DEBUG
-            std::cout << "IC3::Invariant (size = " << cnf_smt2.size()
-            << ")" << std::endl;
-            for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-            std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-
-            // iterate over the SMT2 strings for each clause
-            for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-                std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-                solver->add_assertion(cnf_smt2[i]); // add clause to solver
-            }
-            cnf_smt2.clear();
+            // add (not prop) to solver
+            solver->add_assertion(neg_invar_str);
         }
         solver->pop();
 
@@ -273,24 +214,8 @@ bool IC3::prove() {
          * in subsequent calls to Z3 (next for loop) */
         solver->push(); // create solver stack
 
-        // get SMT2 string corresponding to trans
-        SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2,
-                SMTLIB2::uncomp, NULL);
-
-#ifdef DEBUG
-        std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
-        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-
-        // iterate over the SMT2 strings for each clause
-        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-            solver->add_assertion(cnf_smt2[i]); // add clause to solver
-        }
-        cnf_smt2.clear(); // clear strings
+        // add trans to solver
+        solver->add_assertion(trans_str);
 
         // iterate over frames
         for (unsigned int i = 1; i < k; ++i) {
@@ -403,6 +328,7 @@ bool IC3::prove() {
 bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
         unsigned int k) {
 
+
 #ifdef DEBUG
     std::cout << "\n-------Check proof obligation-------" << std::endl;
     std::cout << "------------------------------------\n" << std::endl;
@@ -415,45 +341,34 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
     solver->push(); // create solver stack
 
-    // get SMT2 string corresponding to trans
-    SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2,
-            SMTLIB2::uncomp, NULL);
+    // add trans to solver
+    solver->add_assertion(trans_str);
 
-#ifdef DEBUG
-    std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
-    for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-    std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-
-    // iterate over the SMT2 strings for each clause
-    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-        std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-        solver->add_assertion(cnf_smt2[i]); // add clause to solver
+    if(k - 1 == 0) {
+        solver->add_assertion(init_str);
     }
-    cnf_smt2.clear(); // clear strings
+    else {
+        std::vector<std::shared_ptr<Clause>> cl = frames[k - 1];
 
-    std::vector<std::shared_ptr<Clause>> cl = frames[k - 1];
+        // get SMT2 string corresponding to frames[k-1]
+        SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2, SMTLIB2::uncomp,
+        NULL);
 
-    // get SMT2 string corresponding to frames[k-1]
-    SMTLIB2::generate_smtlib2_from_clause(cl, cnf_smt2, map2, SMTLIB2::uncomp,
-    NULL);
+    #ifdef DEBUG
+        std::cout << "IC3::Frame (step = " << k-1 << ")" << std::endl;
+        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
+        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
+    #endif
 
-#ifdef DEBUG
-    std::cout << "IC3::Frame (step = " << k-1 << ")" << std::endl;
-    for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-    std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-
-    // iterate over the SMT2 strings for each clause
-    for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-        std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-        solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        // iterate over the SMT2 strings for each clause
+        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
+    #ifdef DEBUG
+            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
+    #endif
+            solver->add_assertion(cnf_smt2[i]); // add clause to solver
+        }
+        cnf_smt2.clear(); // clear strings
     }
-    cnf_smt2.clear(); // clear strings
 
     // get SMT2 string corresponding to (not s)
     SMTLIB2::generate_smtlib2_from_clause(s, cnf_smt2, map2, SMTLIB2::comp,
@@ -516,24 +431,8 @@ bool IC3::check_proof_obligation(std::vector<std::shared_ptr<Clause>> s,
 
         solver->push();
 
-        // get SMT2 string corresponding to trans
-        SMTLIB2::generate_smtlib2_from_clause(trans, cnf_smt2, map2,
-                SMTLIB2::uncomp, NULL);
-
-#ifdef DEBUG
-        std::cout << "IC3::Transition relation (size = " << cnf_smt2.size() << ")" << std::endl;
-        for(unsigned int i = 0; i < cnf_smt2.size(); ++i)
-        std::cout << "IC3::" << cnf_smt2[i] << std::endl;
-#endif
-
-        // iterate over the SMT2 strings for each clause
-        for (unsigned int i = 0; i < cnf_smt2.size(); ++i) {
-#ifdef DEBUG
-            std::cout << "IC3::Adding constraint " << cnf_smt2[i] << std::endl;
-#endif
-            solver->add_assertion(cnf_smt2[i]); // add clause to solver
-        }
-        cnf_smt2.clear(); // clear strings
+        // add trans to solver
+        solver->add_assertion(trans_str);
 
         std::vector<std::shared_ptr<Clause>> cl = frames[k - 1];
 

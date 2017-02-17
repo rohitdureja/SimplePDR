@@ -21,3 +21,4 @@
                                   (and x (not y) (not z) nx ny (not nz))
                                   (and x (not y) z (not nx) ny nz)
                                   (and x y (not z) nx (not ny) nz)) :trans true))
+(define-fun .invar () Bool (! (not (and x (not y) (not z))) :invar-property 0))

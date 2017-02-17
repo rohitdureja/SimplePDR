@@ -18,52 +18,49 @@
  *************************************************************************/
 
 #include <memory>
-
 #include <model/model.h>
 #include <pdr/IC3.h>
-#include <parser/parser.h>
 
-void generate_string(Parser::ast a) {
-    if(a->get_ast_type() == Parser::AND) {
-//        std::cout << "and" << std::endl;
-//        std::cout << a->get_operands().size() << std::endl;
-        std::cout << " (and";
-        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
-            generate_string(a->get_operands()[i]);
+int main(const int argc, const char **argv) {
+
+    std::shared_ptr<Model::Model> M(new Model::Model());
+
+    if (argc == 2) {
+        /** simple help menu **/
+        if (std::strncmp(argv[1], "-h", 2) == 0) {
+            std::cout << "just give a filename to read from a file\n";
+            std::cout << "use -h to get this menu\n";
+            return ( EXIT_SUCCESS);
         }
-        std::cout << ")";
+        /** example reading input from a file **/
+        else {
+            /* read model from file */
+            M->read_model(argv[1]);
+        }
+    } else {
+        /** exit with failure condition **/
+        std::cout << "format: SimplePDR [options] [filename]\n";
+        std::cout << "filename = path to VMT file\n";
+        std::cout << "options\n";
+        std::cout << "  -h : to get this menu\n";
+        return ( EXIT_FAILURE);
     }
-    else if(a->get_ast_type() == Parser::OR) {
-        std::cout << " (or";
-        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
-                    generate_string(a->get_operands()[i]);
-                }
-        }
-    else if(a->get_ast_type() == Parser::NOT) {
-//        std::cout << "not" << std::endl;
-//                std::cout << a->get_operands().size() << std::endl;
-        std::cout << " (not";
-        for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
-                    generate_string(a->get_operands()[i]);
-                }
-        std::cout << ")";
-        }
-    else if(a->get_ast_type() == Parser::EQ) {
-        std::cout << " (=";
-            for(unsigned int i = 0 ; i < a->get_operands().size() ; ++i) {
-                        generate_string(a->get_operands()[i]);
-                    }
-            std::cout << ")";
-            }
-    else if (a->get_ast_type() == Parser::SYM) {
-            std::cout << " " << a->get_ast_string() << "";
-        }
-    return;
-}
 
-int
-main( const int argc, const char **argv ) {
+    /* Model has been read successfully */
+    M->show_init();
+    M->show_trans();
 
+    // Create IC3 instance
+    std::shared_ptr<IC3::IC3> ic3_instance(new IC3::IC3(M));
+
+//     Run the IC3 algorithm
+    bool res = ic3_instance->prove();
+    if (res == true)
+        std::cout << "UNSAT" << std::endl;
+    else
+        std::cout << "SAT" << std::endl;
+
+    return ( EXIT_SUCCESS);
 
     // Specify transition system
 //    std::shared_ptr<Model::Model> M(new Model::Model());
@@ -167,73 +164,68 @@ main( const int argc, const char **argv ) {
 
 //    return 0;
     /** check for the right # of arguments **/
-       if( argc == 2 )
-       {
-          Parser::VMT_Driver driver;
-          /** example for piping input from terminal, i.e., using cat **/
-          if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
-          {
-             driver.parse( std::cin );
-          }
-          /** simple help menu **/
-          else if( std::strncmp( argv[ 1 ], "-h", 2 ) == 0 )
-          {
-             std::cout << "use -o for pipe to std::cin\n";
-             std::cout << "just give a filename to count from a file\n";
-             std::cout << "use -h to get this menu\n";
-             return( EXIT_SUCCESS );
-          }
-          /** example reading input from a file **/
-          else
-          {
-             /** assume file, prod code, use stat to check **/
-             driver.parse( argv[1] );
-             /* file parsed successfully  */
-//             std::cout << driver.get_var_map().size() << std::endl;
-////             for(unsigned int i = 0 ; i < driver.get_def_map().size() ; ++i)
-////             {
+//       if( argc == 2 )
+//       {
+//          Parser::VMT_Driver driver;
+//          /** example for piping input from terminal, i.e., using cat **/
+//          if( std::strncmp( argv[ 1 ], "-o", 2 ) == 0 )
+//          {
+//             driver.parse( std::cin );
+//          }
+//          /** simple help menu **/
+//          else if( std::strncmp( argv[ 1 ], "-h", 2 ) == 0 )
+//          {
+//             std::cout << "use -o for pipe to std::cin\n";
+//             std::cout << "just give a filename to count from a file\n";
+//             std::cout << "use -h to get this menu\n";
+//             return( EXIT_SUCCESS );
+//          }
+//          /** example reading input from a file **/
+//          else
+//          {
+//             /** assume file, prod code, use stat to check **/
+//             driver.parse( argv[1] );
+//             /* file parsed successfully  */
+//                 std::map<AST::ast_node *, AST::ast_node *> cn = driver.get_curr_next();
+//                 for(std::map<AST::ast_node *,AST::ast_node *>::iterator it = cn.begin(); it != cn.end(); ++it) {
+//                                      AST::ast_node * curr = it->first;
+//                                      AST::ast_node * next = cn[it->first];
+//                                      //generate_string(curr);
+//                                      //generate_string(next);
+//                  }
 //
-////                 std::map<std::string, Parser::ast> m = driver.get_def_map();
-//////                 for(std::map<std::string,Parser::ast>::iterator it = m.begin(); it != m.end(); ++it) {
-//////                     std::cout << "here";
-//////                     std::cout << it->first << "\n";
-//////                 }
-////                 std::string ex = ".def_27";
-////
-////                 Parser::ast a = m[ex];
-////                 generate_string(a);
+//                 std::string trans;
+//                 std::cout << "\n\n";
+//                 generate_string(trans, driver.trans);
+//                 std::cout << trans;
 //
-                 std::map<Parser::ast, Parser::ast> cn = driver.get_curr_next();
-                 for(std::map<Parser::ast,Parser::ast>::iterator it = cn.begin(); it != cn.end(); ++it) {
-                                      Parser::ast curr = it->first;
-                                      Parser::ast next = cn[it->first];
-                                      generate_string(curr);
-                                      generate_string(next);
-                  }
-
-                 std::cout << "\n\n";
-                 generate_string(driver.trans);
-
-                 std::cout << "\n\n";
-                 generate_string(driver.init);
-
-
-
-//                 std::cout << a->get_ast_string() << std::endl;
-
-//             }
-//             std::cout << driver.get_def_map().size() << std::endl;
-          }
-
-       }
-       else
-       {
-          /** exit with failure condition **/
-          return ( EXIT_FAILURE );
-       }
-
-
-       return( EXIT_SUCCESS );
+//                 std::string init;
+//                 std::cout << "\n\n";
+//                 generate_string(init, driver.init);
+//                 std::cout << init;
+//
+//                 std::string invar;
+//                 std::cout << "\n\n";
+//                 generate_string(invar, driver.invar);
+//                 std::cout << invar;
+//
+//
+//
+////                 std::cout << a->get_ast_string() << std::endl;
+//
+////             }
+////             std::cout << driver.get_def_map().size() << std::endl;
+//          }
+//
+//       }
+//       else
+//       {
+//          /** exit with failure condition **/
+//          return ( EXIT_FAILURE );
+//       }
+//
+//
+//       return( EXIT_SUCCESS );
 }
 
 // 2017-01-31

@@ -51,7 +51,7 @@ yylval = lval;
 "="				                { return token::EQUAL; }
 "true"                          { return token::_TRUE ; }
 "false"                         { return token::_FALSE ; }
-"."[a-zA-Z0-9\.\_]+                { yylval->build<std::string>(yytext);
+"."[a-zA-Z0-9\.\_]+             { yylval->build<std::string>(yytext);
                                   return token::DEFINE ; }
 [a-zA-Z0-9\.\_]+                { yylval->build<std::string>(yytext);
                                   return token::IDENTIFIER ; }

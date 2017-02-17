@@ -24,6 +24,10 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <utils/ast.h>
+
+
+void generate_string(std::string &, AST::ast_node*);
 
 void split(const std::string &s, const char* delim,
         std::vector<std::string> & v);
